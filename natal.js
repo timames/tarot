@@ -473,7 +473,7 @@ const AstroEngine = (function () {
   MysticApp.register({
     id: 'natal',
     name: 'Natal Chart',
-    icon: '&#128301;',
+    icon: MysticApp.icons.natal,
     desc: 'Your birth chart, computed',
     subtitle: 'The sky at the moment you were born',
     render

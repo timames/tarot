@@ -106,7 +106,7 @@
   MysticApp.register({
     id: 'biorhythm',
     name: 'Biorhythms',
-    icon: '&#128200;',
+    icon: MysticApp.icons.biorhythm,
     desc: 'Your three life cycles',
     subtitle: 'The waves that carry you',
     render

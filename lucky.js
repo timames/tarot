@@ -65,7 +65,7 @@
   MysticApp.register({
     id: 'lucky',
     name: 'Lucky Numbers',
-    icon: '&#127808;',
+    icon: MysticApp.icons.lucky,
     desc: 'Numbers drawn by the sky',
     subtitle: 'Fortune favors the chosen few',
     render

@@ -95,7 +95,7 @@
   MysticApp.register({
     id: 'runes',
     name: 'Runes',
-    icon: '&#5794;',
+    icon: MysticApp.icons.runes,
     desc: 'Elder Futhark casting',
     subtitle: 'Whispers of the old North',
     render

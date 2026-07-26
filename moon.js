@@ -97,7 +97,7 @@
   MysticApp.register({
     id: 'moon',
     name: 'Moon Phase',
-    icon: '&#127765;',
+    icon: MysticApp.icons.moon,
     desc: "Tonight's lunar energy",
     subtitle: 'The moon in her current mood',
     render

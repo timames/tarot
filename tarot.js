@@ -163,7 +163,7 @@
   MysticApp.register({
     id: 'tarot',
     name: 'Tarot',
-    icon: '&#127183;',
+    icon: MysticApp.icons.tarot,
     desc: 'Card spreads & readings',
     subtitle: 'Unveil the wisdom of the cards',
     render

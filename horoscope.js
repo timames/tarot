@@ -154,7 +154,7 @@ const ZODIAC_SIGNS = [
   MysticApp.register({
     id: 'horoscope',
     name: 'Horoscope',
-    icon: '&#9800;',
+    icon: MysticApp.icons.horoscope,
     desc: 'Daily zodiac guidance',
     subtitle: 'What the stars hold for today',
     render

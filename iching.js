@@ -174,7 +174,7 @@
   MysticApp.register({
     id: 'iching',
     name: 'I Ching',
-    icon: '&#9775;',
+    icon: MysticApp.icons.iching,
     desc: 'The Book of Changes',
     subtitle: 'Cast the coins, read the changes',
     render

@@ -104,7 +104,7 @@
   MysticApp.register({
     id: 'numerology',
     name: 'Numerology',
-    icon: '&#128290;',
+    icon: MysticApp.icons.numerology,
     desc: 'The power of your numbers',
     subtitle: 'Life path, destiny & soul numbers',
     render

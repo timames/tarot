@@ -895,3 +895,37 @@ header { position: relative; }
   from { opacity: 0; transform: scale(0.4) translateY(20px); }
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* Chinese zodiac */
+.cz-emoji {
+  font-size: 3.4rem;
+  filter: drop-shadow(0 0 18px rgba(212, 160, 74, 0.35));
+}
+
+/* Footer disclaimer */
+.app-footer {
+  text-align: center;
+  font-size: 0.72rem;
+  color: rgba(154, 139, 176, 0.6);
+  letter-spacing: 0.08em;
+  margin-top: 3rem;
+  padding-bottom: 0.5rem;
+}
+
+/* Occult SVG tile icons */
+.home-tile-icon {
+  color: #d4a04a;
+  display: flex;
+  justify-content: center;
+}
+
+.home-tile-icon svg {
+  width: 46px;
+  height: 46px;
+  filter: drop-shadow(0 0 8px rgba(212, 160, 74, 0.35));
+  transition: filter 0.3s ease;
+}
+
+.home-tile:hover .home-tile-icon svg {
+  filter: drop-shadow(0 0 14px rgba(212, 160, 74, 0.65));
+}
