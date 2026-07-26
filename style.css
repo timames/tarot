@@ -363,6 +363,18 @@ h1 {
   display: none !important;
 }
 
+/* Ad banner space */
+.ad-banner {
+  height: 60px;
+  width: 100%;
+}
+
+/* Safe area for notched phones */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   h1 { font-size: 2rem; }

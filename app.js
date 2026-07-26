@@ -31,7 +31,14 @@ document.querySelectorAll('.spread-btn').forEach(btn => {
   });
 });
 
+let readingCount = 0;
+
 btnNewReading.addEventListener('click', () => {
+  readingCount++;
+  // Show interstitial ad every 3 readings
+  if (readingCount % 3 === 0 && window.showInterstitialAd) {
+    window.showInterstitialAd();
+  }
   readingDiv.classList.add('hidden');
   spreadSelect.classList.remove('hidden');
   interpretation.classList.add('hidden');
