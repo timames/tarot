@@ -6,3 +6,4 @@ www/
 *.keystore
 keystore.properties
 KEYSTORE-INFO.txt
+*.keystore.old.bak
