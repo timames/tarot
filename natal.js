@@ -249,6 +249,18 @@ const AstroEngine = (function () {
 
   let root = null;
 
+  // Every UTC offset in real-world use, including the odd half/quarter hours
+  const TZ_OFFSETS = [-12, -11, -10, -9.5, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0,
+    1, 2, 3, 3.5, 4, 4.5, 5, 5.5, 5.75, 6, 6.5, 7, 8, 8.75, 9, 9.5, 10, 10.5, 11, 12, 12.75, 13, 14];
+
+  function fmtOffset(o) {
+    const sign = o < 0 ? '−' : '+';
+    const abs = Math.abs(o);
+    const h = Math.floor(abs);
+    const m = Math.round((abs - h) * 60);
+    return `UTC${sign}${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
   function render(container) {
     root = container;
     const p = MysticApp.getProfile();
@@ -268,8 +280,11 @@ const AstroEngine = (function () {
           </datalist>
         </label>
         <p class="form-note">Picking a city fills in the timezone and coordinates below automatically — daylight saving is handled for you. City not listed? Pick the nearest one, or fill the fields by hand.</p>
-        <label>UTC offset of birthplace (e.g. -5, 1, 5.5)
-          <input type="number" id="natal-tz" step="0.25" min="-12" max="14" value="${p.birthTz !== undefined ? MysticApp.esc(p.birthTz) : ''}" placeholder="e.g. -5 for New York EST">
+        <label>UTC offset of birthplace
+          <select id="natal-tz">
+            <option value="">— select (or pick a city above) —</option>
+            ${TZ_OFFSETS.map(o => `<option value="${o}" ${String(p.birthTz) === String(o) ? 'selected' : ''}>${fmtOffset(o)}</option>`).join('')}
+          </select>
         </label>
         <div class="form-row">
           <label>Latitude
