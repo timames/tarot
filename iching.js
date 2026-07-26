@@ -169,6 +169,7 @@
     result.innerHTML = html;
     container.querySelector('.iching-intro').classList.add('hidden');
     result.querySelector('#btn-recast').addEventListener('click', () => render(container));
+    if (MysticApp.adReadingDone) MysticApp.adReadingDone();
   }
 
   MysticApp.register({

@@ -90,6 +90,7 @@
     container.querySelector('.spread-select').classList.add('hidden');
     result.querySelector('#btn-recast-runes').addEventListener('click', () => render(container));
     window.scrollTo(0, 0);
+    if (MysticApp.adReadingDone) MysticApp.adReadingDone();
   }
 
   MysticApp.register({

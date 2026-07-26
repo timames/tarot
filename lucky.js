@@ -60,6 +60,7 @@
     html += `<div class="sky-stamp">${MysticApp.skyStamp()}</div>`;
 
     root.querySelector('#lucky-result').innerHTML = html;
+    if (MysticApp.adReadingDone) MysticApp.adReadingDone();
   }
 
   MysticApp.register({

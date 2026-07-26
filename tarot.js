@@ -136,6 +136,7 @@
     interpretation.innerHTML = html;
     interpretation.classList.remove('hidden');
     root.querySelector('#btn-new-reading').classList.remove('hidden');
+    if (MysticApp.adReadingDone) MysticApp.adReadingDone();
   }
 
   function generateSummary() {
