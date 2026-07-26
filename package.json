@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "powershell -NoProfile -Command \"New-Item -ItemType Directory -Force www | Out-Null; Copy-Item -Force index.html,style.css,app.js,cards.js,art.js,tarot.js,horoscope.js,natal.js,nature.js,numerology.js,iching.js,runes.js,moon.js,biorhythm.js,lucky.js,chinese.js,ads.js www\"",
+    "build": "node build.js",
     "cap:sync": "npm run build && npx cap sync",
     "deploy": "npm run build && npx wrangler pages deploy www --project-name=tarot",
     "cap:android": "npm run cap:sync && npx cap open android",
