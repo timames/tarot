@@ -198,8 +198,9 @@ const MysticApp = (function () {
     els.back.addEventListener('click', showHome);
 
     // Subdomain routing — auto-open module based on hostname
+    // Note: no 'tarot' entry — tarot.ripdi.net is the main site domain
+    // and should land on the home grid, not deep-link into a module.
     const subdomainMap = {
-      'tarot': 'Tarot',
       'numerology': 'Numerology',
       'astrology': 'Horoscope',
       'iching': 'I Ching',
