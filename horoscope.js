@@ -2,18 +2,18 @@
 // Readings are deterministic per (sign, day) so they don't change on refresh.
 
 const ZODIAC_SIGNS = [
-  { name: "Aries", glyph: "♈", dates: "Mar 21 – Apr 19", element: "Fire", quality: "Cardinal", ruler: "Mars", traits: "Bold, ambitious, direct, passionate", compat: "Leo, Sagittarius, Gemini" },
-  { name: "Taurus", glyph: "♉", dates: "Apr 20 – May 20", element: "Earth", quality: "Fixed", ruler: "Venus", traits: "Steadfast, sensual, patient, devoted", compat: "Virgo, Capricorn, Cancer" },
-  { name: "Gemini", glyph: "♊", dates: "May 21 – Jun 20", element: "Air", quality: "Mutable", ruler: "Mercury", traits: "Curious, adaptable, witty, expressive", compat: "Libra, Aquarius, Aries" },
-  { name: "Cancer", glyph: "♋", dates: "Jun 21 – Jul 22", element: "Water", quality: "Cardinal", ruler: "Moon", traits: "Nurturing, intuitive, protective, tenacious", compat: "Scorpio, Pisces, Taurus" },
-  { name: "Leo", glyph: "♌", dates: "Jul 23 – Aug 22", element: "Fire", quality: "Fixed", ruler: "Sun", traits: "Radiant, generous, dramatic, loyal", compat: "Aries, Sagittarius, Libra" },
-  { name: "Virgo", glyph: "♍", dates: "Aug 23 – Sep 22", element: "Earth", quality: "Mutable", ruler: "Mercury", traits: "Precise, analytical, helpful, modest", compat: "Taurus, Capricorn, Cancer" },
-  { name: "Libra", glyph: "♎", dates: "Sep 23 – Oct 22", element: "Air", quality: "Cardinal", ruler: "Venus", traits: "Harmonious, diplomatic, charming, fair", compat: "Gemini, Aquarius, Leo" },
-  { name: "Scorpio", glyph: "♏", dates: "Oct 23 – Nov 21", element: "Water", quality: "Fixed", ruler: "Pluto & Mars", traits: "Intense, magnetic, perceptive, resolute", compat: "Cancer, Pisces, Virgo" },
-  { name: "Sagittarius", glyph: "♐", dates: "Nov 22 – Dec 21", element: "Fire", quality: "Mutable", ruler: "Jupiter", traits: "Adventurous, optimistic, candid, free", compat: "Aries, Leo, Aquarius" },
-  { name: "Capricorn", glyph: "♑", dates: "Dec 22 – Jan 19", element: "Earth", quality: "Cardinal", ruler: "Saturn", traits: "Disciplined, ambitious, wise, enduring", compat: "Taurus, Virgo, Scorpio" },
-  { name: "Aquarius", glyph: "♒", dates: "Jan 20 – Feb 18", element: "Air", quality: "Fixed", ruler: "Uranus & Saturn", traits: "Visionary, independent, humanitarian, original", compat: "Gemini, Libra, Sagittarius" },
-  { name: "Pisces", glyph: "♓", dates: "Feb 19 – Mar 20", element: "Water", quality: "Mutable", ruler: "Neptune & Jupiter", traits: "Dreamy, empathic, artistic, gentle", compat: "Cancer, Scorpio, Capricorn" }
+  { name: "Aries", glyph: "♈︎", dates: "Mar 21 – Apr 19", element: "Fire", quality: "Cardinal", ruler: "Mars", traits: "Bold, ambitious, direct, passionate", compat: "Leo, Sagittarius, Gemini" },
+  { name: "Taurus", glyph: "♉︎", dates: "Apr 20 – May 20", element: "Earth", quality: "Fixed", ruler: "Venus", traits: "Steadfast, sensual, patient, devoted", compat: "Virgo, Capricorn, Cancer" },
+  { name: "Gemini", glyph: "♊︎", dates: "May 21 – Jun 20", element: "Air", quality: "Mutable", ruler: "Mercury", traits: "Curious, adaptable, witty, expressive", compat: "Libra, Aquarius, Aries" },
+  { name: "Cancer", glyph: "♋︎", dates: "Jun 21 – Jul 22", element: "Water", quality: "Cardinal", ruler: "Moon", traits: "Nurturing, intuitive, protective, tenacious", compat: "Scorpio, Pisces, Taurus" },
+  { name: "Leo", glyph: "♌︎", dates: "Jul 23 – Aug 22", element: "Fire", quality: "Fixed", ruler: "Sun", traits: "Radiant, generous, dramatic, loyal", compat: "Aries, Sagittarius, Libra" },
+  { name: "Virgo", glyph: "♍︎", dates: "Aug 23 – Sep 22", element: "Earth", quality: "Mutable", ruler: "Mercury", traits: "Precise, analytical, helpful, modest", compat: "Taurus, Capricorn, Cancer" },
+  { name: "Libra", glyph: "♎︎", dates: "Sep 23 – Oct 22", element: "Air", quality: "Cardinal", ruler: "Venus", traits: "Harmonious, diplomatic, charming, fair", compat: "Gemini, Aquarius, Leo" },
+  { name: "Scorpio", glyph: "♏︎", dates: "Oct 23 – Nov 21", element: "Water", quality: "Fixed", ruler: "Pluto & Mars", traits: "Intense, magnetic, perceptive, resolute", compat: "Cancer, Pisces, Virgo" },
+  { name: "Sagittarius", glyph: "♐︎", dates: "Nov 22 – Dec 21", element: "Fire", quality: "Mutable", ruler: "Jupiter", traits: "Adventurous, optimistic, candid, free", compat: "Aries, Leo, Aquarius" },
+  { name: "Capricorn", glyph: "♑︎", dates: "Dec 22 – Jan 19", element: "Earth", quality: "Cardinal", ruler: "Saturn", traits: "Disciplined, ambitious, wise, enduring", compat: "Taurus, Virgo, Scorpio" },
+  { name: "Aquarius", glyph: "♒︎", dates: "Jan 20 – Feb 18", element: "Air", quality: "Fixed", ruler: "Uranus & Saturn", traits: "Visionary, independent, humanitarian, original", compat: "Gemini, Libra, Sagittarius" },
+  { name: "Pisces", glyph: "♓︎", dates: "Feb 19 – Mar 20", element: "Water", quality: "Mutable", ruler: "Neptune & Jupiter", traits: "Dreamy, empathic, artistic, gentle", compat: "Cancer, Scorpio, Capricorn" }
 ];
 
 (function () {
@@ -100,7 +100,7 @@ const ZODIAC_SIGNS = [
   function showSign(sign) {
     const r = dailyReading(sign);
     const dateStr = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-    const starStr = '★'.repeat(r.stars) + '☆'.repeat(5 - r.stars);
+    const starStr = '★︎'.repeat(r.stars) + '☆︎'.repeat(5 - r.stars);
 
     root.innerHTML = `
       <div class="sign-header">
@@ -121,15 +121,15 @@ const ZODIAC_SIGNS = [
         <div class="interp-meaning">${r.general}</div>
       </div>
       <div class="interp-card">
-        <h3>&#10084;&#65039; Love</h3>
+        <h3>Love</h3>
         <div class="interp-meaning">${r.love}</div>
       </div>
       <div class="interp-card">
-        <h3>&#128188; Career</h3>
+        <h3>Career</h3>
         <div class="interp-meaning">${r.career}</div>
       </div>
       <div class="interp-card">
-        <h3>&#127807; Wellness</h3>
+        <h3>Wellness</h3>
         <div class="interp-meaning">${r.wellness}</div>
       </div>
 

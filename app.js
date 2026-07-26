@@ -145,6 +145,7 @@ const MysticApp = (function () {
     els.title.textContent = 'Mystic Oracle';
     els.subtitle.textContent = 'Ancient wisdom at your fingertips';
     els.view.innerHTML = '';
+    if (els.footer) els.footer.classList.remove('hidden');
     window.scrollTo(0, 0);
   }
 
@@ -156,6 +157,7 @@ const MysticApp = (function () {
     els.title.textContent = mod.name;
     els.subtitle.textContent = mod.subtitle;
     els.view.innerHTML = '';
+    if (els.footer) els.footer.classList.add('hidden');
     mod.render(els.view);
     window.scrollTo(0, 0);
   }
@@ -180,6 +182,7 @@ const MysticApp = (function () {
     els.back = document.getElementById('btn-back');
     els.title = document.getElementById('app-title');
     els.subtitle = document.getElementById('app-subtitle');
+    els.footer = document.querySelector('.app-footer');
 
     createStars();
 

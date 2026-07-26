@@ -198,7 +198,7 @@ const AstroEngine = (function () {
 
 (function () {
   const SIGN_NAMES = ["Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"];
-  const SIGN_GLYPHS = ["♈", "♉", "♊", "♋", "♌", "♍", "♎", "♏", "♐", "♑", "♒", "♓"];
+  const SIGN_GLYPHS = ["♈︎", "♉︎", "♊︎", "♋︎", "♌︎", "♍︎", "♎︎", "♏︎", "♐︎", "♑︎", "♒︎", "♓︎"];
   const ELEMENT_OF_SIGN =["Fire", "Earth", "Air", "Water", "Fire", "Earth", "Air", "Water", "Fire", "Earth", "Air", "Water"];
   const SIGN_FLAVOR = [
     "bold, pioneering, direct energy",
@@ -215,7 +215,7 @@ const AstroEngine = (function () {
     "dreamy, empathic, boundless energy"
   ];
 
-  const PLANET_GLYPHS = { Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀", Mars: "♂", Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇", Ascendant: "Asc", Midheaven: "MC" };
+  const PLANET_GLYPHS = { Sun: "☉", Moon: "☽", Mercury: "☿", Venus: "♀︎", Mars: "♂︎", Jupiter: "♃", Saturn: "♄", Uranus: "♅", Neptune: "♆", Pluto: "♇", Ascendant: "Asc", Midheaven: "MC" };
   const PLANET_ROLES = {
     Sun: "your core identity and vitality",
     Moon: "your emotions and inner needs",
@@ -254,13 +254,20 @@ const AstroEngine = (function () {
     const p = MysticApp.getProfile();
     container.innerHTML = `
       <form class="mystic-form" id="natal-form">
-        <p class="form-note">Enter your birth details. Time and place unlock your Ascendant, Midheaven, and houses — leave them blank if unknown.</p>
+        <p class="form-note">Enter your birth details. Time and place unlock your Ascendant and Midheaven — leave them blank if unknown.</p>
         <label>Birth date
           <input type="date" id="natal-date" required value="${MysticApp.esc(p.birthDate || '')}">
         </label>
         <label>Birth time (local)
           <input type="time" id="natal-time" value="${MysticApp.esc(p.birthTime || '')}">
         </label>
+        <label>Birthplace — start typing a city
+          <input type="text" id="natal-city" list="natal-city-list" autocomplete="off" placeholder="e.g. New York, USA" value="${MysticApp.esc(p.birthCity || '')}">
+          <datalist id="natal-city-list">
+            ${CITY_LIST.map(c => `<option value="${MysticApp.esc(c[0])}"></option>`).join('')}
+          </datalist>
+        </label>
+        <p class="form-note">Picking a city fills in the timezone and coordinates below automatically — daylight saving is handled for you. City not listed? Pick the nearest one, or fill the fields by hand.</p>
         <label>UTC offset of birthplace (e.g. -5, 1, 5.5)
           <input type="number" id="natal-tz" step="0.25" min="-12" max="14" value="${p.birthTz !== undefined ? MysticApp.esc(p.birthTz) : ''}" placeholder="e.g. -5 for New York EST">
         </label>
@@ -281,6 +288,22 @@ const AstroEngine = (function () {
       e.preventDefault();
       castChart();
     });
+
+    // City picker: fill tz/lat/lon whenever the city, date, or time changes
+    function applyCity() {
+      const name = container.querySelector('#natal-city').value.trim();
+      const city = CITY_LIST.find(c => c[0].toLowerCase() === name.toLowerCase());
+      if (!city) return;
+      container.querySelector('#natal-lat').value = city[1];
+      container.querySelector('#natal-lon').value = city[2];
+      const off = cityUtcOffset(city[3], container.querySelector('#natal-date').value || '2000-01-01', container.querySelector('#natal-time').value);
+      if (off !== null) container.querySelector('#natal-tz').value = off;
+      MysticApp.saveProfile({ birthCity: city[0] });
+    }
+    ['natal-city', 'natal-date', 'natal-time'].forEach(id => {
+      container.querySelector('#' + id).addEventListener('change', applyCity);
+    });
+    container.querySelector('#natal-city').addEventListener('input', applyCity);
   }
 
   function castChart() {
@@ -419,7 +442,7 @@ const AstroEngine = (function () {
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   function drawWheel(c) {
-    const size = 340, cx = size / 2, cy = size / 2;
+    const size = 372, cx = size / 2, cy = size / 2;
     const rOuter = 160, rSigns = 143, rInner = 126, rPlanet = 100, rHub = 55;
     // Longitude 0° at 9 o'clock, increasing counterclockwise (visual).
     // If an ascendant exists, rotate so it sits at 9 o'clock like a real chart.

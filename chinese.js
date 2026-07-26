@@ -120,7 +120,7 @@
         </div>
 
         <div class="interp-card featured">
-          <h3>${animal.emoji} The ${animal.name}</h3>
+          <h3><span class="cz-tint">${animal.emoji}</span> The ${animal.name}</h3>
           <div class="interp-meaning">${animal.traits}</div>
         </div>
         <div class="interp-card">
@@ -129,13 +129,13 @@
         </div>
 
         <div class="lucky-row">
-          <div class="lucky-item"><div class="lucky-label">Allies</div><div class="lucky-value">${allies.map(a => a.emoji + ' ' + a.name).join(' · ')}</div></div>
-          <div class="lucky-item"><div class="lucky-label">Secret Friend</div><div class="lucky-value">${secret.emoji} ${secret.name}</div></div>
-          <div class="lucky-item"><div class="lucky-label">Opposite</div><div class="lucky-value">${clash.emoji} ${clash.name}</div></div>
+          <div class="lucky-item"><div class="lucky-label">Allies</div><div class="lucky-value">${allies.map(a => '<span class="cz-tint">' + a.emoji + '</span> ' + a.name).join(' · ')}</div></div>
+          <div class="lucky-item"><div class="lucky-label">Secret Friend</div><div class="lucky-value"><span class="cz-tint">${secret.emoji}</span> ${secret.name}</div></div>
+          <div class="lucky-item"><div class="lucky-label">Opposite</div><div class="lucky-value"><span class="cz-tint">${clash.emoji}</span> ${clash.name}</div></div>
         </div>
 
         <div class="interp-summary">
-          <h3>${nowYear} — Year of the ${nowElement} ${nowAnimal.name} ${nowAnimal.emoji}</h3>
+          <h3>${nowYear} — Year of the ${nowElement} ${nowAnimal.name}</h3>
           <p>${yearNote}</p>
         </div>
       `;

@@ -13,17 +13,17 @@
         <h2>Choose Your Reading</h2>
         <div class="spread-options">
           <button class="spread-btn" data-spread="1">
-            <div class="spread-icon">&#9733;</div>
+            <div class="spread-icon">&#9733;&#xFE0E;</div>
             <div class="spread-name">Single Card</div>
             <div class="spread-desc">Quick daily guidance</div>
           </button>
           <button class="spread-btn" data-spread="3">
-            <div class="spread-icon">&#9733;&#9733;&#9733;</div>
+            <div class="spread-icon">&#9733;&#xFE0E;&#9733;&#xFE0E;&#9733;&#xFE0E;</div>
             <div class="spread-name">Three Card</div>
             <div class="spread-desc">Past, Present, Future</div>
           </button>
           <button class="spread-btn" data-spread="5">
-            <div class="spread-icon">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="spread-icon">&#9733;&#xFE0E;&#9733;&#xFE0E;&#9733;&#xFE0E;&#9733;&#xFE0E;&#9733;&#xFE0E;</div>
             <div class="spread-name">Five Card</div>
             <div class="spread-desc">Cross spread for deeper insight</div>
           </button>
@@ -60,6 +60,11 @@
     root.querySelector('#tarot-interpretation').classList.add('hidden');
     root.querySelector('#btn-new-reading').classList.add('hidden');
     cardsContainer.innerHTML = '';
+    const hint = document.createElement('div');
+    hint.className = 'tap-hint';
+    hint.id = 'tap-hint';
+    hint.textContent = 'Tap each card to reveal';
+    cardsContainer.before(hint);
     flippedCount = 0;
 
     const rng = MysticApp.natureRng();
@@ -116,7 +121,7 @@
       const meaning = card.isReversed ? card.reversed : card.upright;
       html += `
         <div class="interp-card">
-          <h3>${card.icon} ${card.name}</h3>
+          <h3>${card.name}</h3>
           <div class="interp-position">${labels[i]}</div>
           ${card.isReversed ? '<div class="interp-reversed">Reversed</div>' : ''}
           <div class="interp-meaning">${meaning}</div>
@@ -135,6 +140,9 @@
     const interpretation = root.querySelector('#tarot-interpretation');
     interpretation.innerHTML = html;
     interpretation.classList.remove('hidden');
+    const hintEl = root.querySelector('#tap-hint');
+    if (hintEl) hintEl.remove();
+    interpretation.scrollIntoView({ behavior: 'smooth' });
     root.querySelector('#btn-new-reading').classList.remove('hidden');
     if (MysticApp.adReadingDone) MysticApp.adReadingDone();
   }

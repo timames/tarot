@@ -48,9 +48,10 @@ header {
 }
 
 h1 {
-  font-size: 3rem;
+  font-size: clamp(1.35rem, 6.5vw, 3rem);
+  padding: 0 3.4rem;
   font-weight: 300;
-  letter-spacing: 0.3em;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   background: linear-gradient(135deg, #f0c27f, #d4a04a, #f0c27f);
   -webkit-background-clip: text;
@@ -148,8 +149,9 @@ h1 {
   transform: rotateY(180deg);
 }
 
-.card.reversed.flipped {
-  transform: rotateY(180deg) rotate(180deg);
+/* Reversed cards flip only the illustration, so text stays readable */
+.card.reversed .card-illustration {
+  transform: rotate(180deg);
 }
 
 .card-face {
@@ -343,22 +345,24 @@ h1 {
 .btn-primary {
   display: block;
   margin: 2rem auto;
-  padding: 0.9rem 2.5rem;
-  background: transparent;
-  border: 1px solid rgba(212, 160, 74, 0.5);
-  color: #d4a04a;
+  padding: 0.95rem 2.6rem;
+  background: linear-gradient(160deg, #e3b96a, #c08c2e);
+  border: 1px solid rgba(255, 230, 180, 0.35);
+  color: #221304;
   font-size: 1rem;
-  letter-spacing: 0.1em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
   border-radius: 30px;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 18px rgba(212, 160, 74, 0.25);
 }
 
 .btn-new-reading:hover,
 .btn-primary:hover {
-  background: rgba(212, 160, 74, 0.15);
-  border-color: #d4a04a;
-  box-shadow: 0 0 20px rgba(212, 160, 74, 0.2);
+  filter: brightness(1.08);
+  box-shadow: 0 6px 26px rgba(212, 160, 74, 0.4);
+  transform: translateY(-1px);
 }
 
 .hidden {
@@ -386,11 +390,13 @@ body {
 header { position: relative; }
 
 .btn-back {
-  position: absolute;
-  left: 0;
-  top: 0.4rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(212, 160, 74, 0.35);
+  position: fixed;
+  left: max(0.75rem, env(safe-area-inset-left));
+  top: calc(0.75rem + env(safe-area-inset-top));
+  background: rgba(20, 8, 43, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(212, 160, 74, 0.45);
   color: #d4a04a;
   font-size: 1.3rem;
   width: 44px;
@@ -398,7 +404,8 @@ header { position: relative; }
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
-  z-index: 2;
+  z-index: 10;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
 }
 
 .btn-back:hover {
@@ -490,7 +497,7 @@ header { position: relative; }
 
 .form-note {
   font-size: 0.85rem;
-  color: #9a8bb0;
+  color: #ab9ec4;
   line-height: 1.6;
   text-align: center;
   max-width: 480px;
@@ -821,8 +828,8 @@ header { position: relative; }
 }
 
 .stepper-btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid rgba(212, 160, 74, 0.4);
   background: rgba(212, 160, 74, 0.08);
@@ -928,4 +935,85 @@ header { position: relative; }
 
 .home-tile:hover .home-tile-icon svg {
   filter: drop-shadow(0 0 14px rgba(212, 160, 74, 0.65));
+}
+
+/* ===== UI polish round ===== */
+
+/* Display face for headings (self-hosted, works offline in native apps) */
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/cinzel-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+2013-2014, U+2018-201A, U+201C-201E, U+2026;
+}
+@font-face {
+  font-family: 'Cinzel';
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+  src: url('fonts/cinzel-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+1E00-1EFF, U+2020, U+20A0-20AB;
+}
+
+h1, h2, h3,
+.home-tile-name,
+.spread-name,
+.zodiac-name,
+.hex-name,
+.lucky-value,
+.stepper-value {
+  font-family: 'Cinzel', 'Segoe UI', Georgia, serif;
+}
+
+/* Tap-to-reveal hint */
+.tap-hint {
+  text-align: center;
+  font-size: 0.82rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #ab9ec4;
+  margin: 0 0 1.25rem;
+  animation: hintPulse 2.2s ease-in-out infinite;
+}
+
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+/* Fit three tarot cards side by side on phones */
+@media (max-width: 430px) {
+  .card { width: 102px; height: 172px; }
+  .card-illustration { font-size: 2rem; }
+  .card-illustration svg { max-height: 104px; }
+  .card-title { font-size: 0.68rem; }
+  .card-numeral { font-size: 0.62rem; }
+  .card-suit { font-size: 0.55rem; }
+  .cards-container { gap: 0.6rem; }
+  .card-slot-label { font-size: 0.66rem; }
+}
+
+/* Gold-tint the Chinese zodiac animal emoji so they sit in the palette */
+.cz-emoji,
+.cz-tint {
+  filter: grayscale(1) sepia(1) saturate(3) hue-rotate(-12deg) brightness(1.05);
+}
+
+/* Keyboard/switch-access focus */
+:focus-visible {
+  outline: 2px solid #e3b96a;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .star { display: none; }
 }
