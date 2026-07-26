@@ -5,3 +5,4 @@ www/
 *.log
 *.keystore
 keystore.properties
+KEYSTORE-INFO.txt
