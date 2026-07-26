@@ -7,15 +7,69 @@
   const ARC2 = 'NOPQRSTUVWXYZ';
   const NUMS = '1234567890';
 
-  const ANSWERS = [
-    { target: 'YES' }, { target: 'YES' }, { target: 'NO' }, { target: 'NO' },
-    { spell: 'SOON' }, { spell: 'NOT YET' }, { spell: 'NEVER' }, { spell: 'ALWAYS' },
-    { spell: 'TRUST' }, { spell: 'BEWARE' }, { spell: 'WAIT' }, { spell: 'LET GO' },
-    { spell: 'HOPE' }, { spell: 'BELIEVE' }, { spell: 'DESTINY' }, { spell: 'COURAGE' },
-    { spell: 'ASK THE MOON' }, { spell: 'IT IS KNOWN' }, { spell: 'LOOK WITHIN' },
-    { spell: 'PATIENCE' }, { spell: 'THE ANSWER SLEEPS' }, { spell: 'FATE DECIDES' },
-    { spell: 'IN TIME' }, { spell: 'SHADOWS PASS' }
+  // The spirits listen: answers are inferred from the question's shape
+  // (yes/no, when, who, where, why, how, what) and its subject
+  // (love, fortune, health...). Strings are spelled out; {target} glides
+  // straight to YES or NO.
+  const GENERIC = [
+    'TRUST', 'BEWARE', 'WAIT', 'LET GO', 'HOPE', 'BELIEVE', 'DESTINY',
+    'COURAGE', 'ASK THE MOON', 'IT IS KNOWN', 'LOOK WITHIN', 'PATIENCE',
+    'THE ANSWER SLEEPS', 'FATE DECIDES', 'IN TIME', 'SHADOWS PASS'
   ];
+
+  function chooseAnswer(question, rng) {
+    const q = question.toLowerCase().trim();
+    if (!q) {
+      return MysticApp.pick(['SPEAK', 'ASK ALOUD', 'WE ARE LISTENING', 'ASK AND KNOW'], rng);
+    }
+
+    const has = (...words) => words.some(w => new RegExp('\\b' + w + '\\b').test(q));
+
+    // Some doors stay closed
+    if (has('die', 'death', 'dead', 'kill', 'suicide')) {
+      return MysticApp.pick(['THE VEIL STAYS CLOSED', 'NOT OURS TO TELL', 'LIVE FIRST', 'ASK OF LIFE INSTEAD'], rng);
+    }
+
+    const pool = [];
+
+    // Subject flavor
+    if (has('love', 'crush', 'marry', 'marriage', 'relationship', 'boyfriend', 'girlfriend', 'partner', 'soulmate', 'date', 'heart', 'ex')) {
+      pool.push('LOVE FINDS YOU', 'FOLLOW YOUR HEART', 'THEY THINK OF YOU', 'AN OLD FLAME STIRS', 'OPEN YOUR HEART');
+    }
+    if (has('money', 'job', 'work', 'career', 'rich', 'business', 'pay', 'promotion', 'lottery', 'wealth')) {
+      pool.push('FORTUNE COMES', 'WORK PAYS', 'PATIENCE PAYS', 'NOT BY GOLD ALONE', 'AN OFFER COMES');
+    }
+    if (has('health', 'sick', 'ill', 'heal', 'tired', 'pain')) {
+      pool.push('REST', 'HEAL SLOWLY', 'CARE FOR YOURSELF', 'STRENGTH RETURNS');
+    }
+    if (has('friend', 'family', 'mother', 'father', 'sister', 'brother')) {
+      pool.push('BLOOD IS TRUE', 'REACH OUT', 'FORGIVE', 'THEY MISS YOU');
+    }
+
+    // Question shape
+    const first = q.split(/\s+/)[0];
+    if (first === 'when' || /\b(when will|how long|how soon)\b/.test(q)) {
+      pool.push('SOON', 'NOT YET', 'IN TIME', '3 MOONS', '7 DAYS', 'WHEN YOU ARE READY', 'SOONER THAN YOU THINK');
+    } else if (first === 'who') {
+      pool.push('SOMEONE NEAR', 'A STRANGER', 'YOU KNOW WHO', 'A FRIEND', 'LOOK CLOSER');
+    } else if (first === 'where') {
+      pool.push('CLOSE BY', 'FAR FROM HERE', 'HOME', 'WITHIN YOU', 'WHERE YOU LEFT IT');
+    } else if (first === 'why') {
+      pool.push('YOU KNOW WHY', 'IT HAD TO BE', 'FATE', 'ASK YOUR HEART', 'TO TEACH YOU');
+    } else if (first === 'how') {
+      pool.push('SLOWLY', 'WITH COURAGE', 'NOT ALONE', 'STEP BY STEP', 'AS BEFORE');
+    } else if (first === 'what') {
+      pool.push('A SIGN COMES', 'CHANGE', 'THE TRUTH', 'A GIFT', 'WHAT YOU FEAR', 'WHAT YOU HOPE');
+    } else if (/^(will|is|are|do|does|can|should|could|would|am|did|has|have|shall|was|were)\b/.test(q) || q.endsWith('?')) {
+      pool.push({ target: 'YES' }, { target: 'YES' }, { target: 'NO' },
+        'SIGNS SAY YES', 'UNLIKELY', 'IF YOU DARE', 'SOON', 'NEVER', 'ALWAYS', 'ASK AGAIN');
+    }
+
+    if (!pool.length) return MysticApp.pick(GENERIC, rng);
+    // A touch of mystery even for pointed questions
+    pool.push('THE MOON KNOWS', 'FATE DECIDES');
+    return MysticApp.pick(pool, rng);
+  }
 
   // Positions in board-percent coordinates {x: 0-100, y: 0-100}
   const POS = {};
@@ -110,8 +164,14 @@
     answerEl.textContent = '';
     container.querySelector('#ouija-stamp').innerHTML = '';
 
-    const rng = MysticApp.natureRng();
-    const answer = MysticApp.pick(ANSWERS, rng);
+    // The same question receives the same answer — until tomorrow.
+    // Wandering questions (or none) fall to the whim of the sky.
+    const question = container.querySelector('#ouija-question').value;
+    const rng = question.trim()
+      ? MysticApp.seededRng(question.trim().toLowerCase() + '|' + MysticApp.todayKey())
+      : MysticApp.natureRng();
+    const raw = chooseAnswer(question, rng);
+    const answer = typeof raw === 'string' ? { spell: raw } : raw;
 
     const STEP = 1100;
     let t = 300;
@@ -160,6 +220,9 @@
       if (MysticApp.adReadingDone) MysticApp.adReadingDone();
     }, t + 2100));
   }
+
+  // Exposed for testing the inference engine
+  MysticApp._ouijaAnswer = chooseAnswer;
 
   MysticApp.register({
     id: 'ouija',
