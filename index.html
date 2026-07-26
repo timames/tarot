@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mystic Tarot</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <div class="app">
+    <header>
+      <h1>Mystic Tarot</h1>
+      <p class="subtitle">Unveil the wisdom of the cards</p>
+    </header>
+
+    <main id="main">
+      <div class="spread-select" id="spread-select">
+        <h2>Choose Your Reading</h2>
+        <div class="spread-options">
+          <button class="spread-btn" data-spread="1">
+            <div class="spread-icon">&#9733;</div>
+            <div class="spread-name">Single Card</div>
+            <div class="spread-desc">Quick daily guidance</div>
+          </button>
+          <button class="spread-btn" data-spread="3">
+            <div class="spread-icon">&#9733;&#9733;&#9733;</div>
+            <div class="spread-name">Three Card</div>
+            <div class="spread-desc">Past, Present, Future</div>
+          </button>
+          <button class="spread-btn" data-spread="5">
+            <div class="spread-icon">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+            <div class="spread-name">Five Card</div>
+            <div class="spread-desc">Cross spread for deeper insight</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="reading hidden" id="reading">
+        <div class="cards-container" id="cards-container"></div>
+        <div class="interpretation hidden" id="interpretation"></div>
+        <button class="btn-new-reading hidden" id="btn-new-reading">New Reading</button>
+      </div>
+    </main>
+  </div>
+
+  <script src="cards.js"></script>
+  <script src="art.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
