@@ -143,7 +143,7 @@ const MysticApp = (function () {
   // one free per local day. Premium unlocks everything (flag is set by the
   // store purchase flow once billing is wired up).
 
-  const ALWAYS_FREE = ['horoscope'];
+  const ALWAYS_FREE = ['horoscope', 'tarot'];
 
   function isPremium() {
     try { return localStorage.getItem('mystic-premium') === '1'; } catch (e) { return false; }
