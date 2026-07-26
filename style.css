@@ -1141,3 +1141,107 @@ h1, h2, h3,
   background: rgba(212, 160, 74, 0.12);
   border-color: #d4a04a;
 }
+
+/* ===== Spirit board ===== */
+
+.ouija-wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.ouija-board {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 10 / 7;
+  margin: 1.25rem auto;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(212, 160, 74, 0.06), transparent 65%),
+    linear-gradient(160deg, #241433, #140a24 70%, #0d0518);
+  border: 2px solid rgba(212, 160, 74, 0.45);
+  border-radius: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.55), inset 0 0 60px rgba(20, 8, 40, 0.8);
+  overflow: hidden;
+  user-select: none;
+}
+
+.ouija-board::before {
+  content: '☽';
+  position: absolute;
+  left: 6%;
+  bottom: 6%;
+  color: rgba(212, 160, 74, 0.4);
+  font-size: 1.3rem;
+}
+
+.ouija-board::after {
+  content: '☀\FE0E';
+  position: absolute;
+  right: 6%;
+  bottom: 6%;
+  color: rgba(212, 160, 74, 0.4);
+  font-size: 1.3rem;
+}
+
+.ouija-char {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: clamp(0.72rem, 2.6vw, 1.15rem);
+  color: #cbb27e;
+  letter-spacing: 0.05em;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  pointer-events: none;
+}
+
+.ouija-word { font-size: clamp(0.7rem, 2.4vw, 1rem); letter-spacing: 0.18em; }
+
+.ouija-char.lit {
+  color: #ffe9bd;
+  text-shadow: 0 0 14px rgba(255, 220, 150, 0.95), 0 0 30px rgba(212, 160, 74, 0.6);
+}
+
+.planchette {
+  position: absolute;
+  width: clamp(44px, 12%, 72px);
+  transform: translate(-50%, -36%);
+  transition: left 0.85s cubic-bezier(0.45, 0.05, 0.35, 1), top 0.85s cubic-bezier(0.45, 0.05, 0.35, 1), transform 0.85s ease;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.6));
+  pointer-events: none;
+  z-index: 3;
+}
+
+.planchette svg { width: 100%; height: auto; display: block; }
+
+.ouija-answer {
+  min-height: 2.2rem;
+  font-family: 'Cinzel', Georgia, serif;
+  font-size: 1.35rem;
+  letter-spacing: 0.3em;
+  color: #ffe9bd;
+  text-shadow: 0 0 18px rgba(212, 160, 74, 0.5);
+  margin: 0.75rem 0 0.25rem;
+}
+
+/* Spirit board question input + taller board */
+.ouija-input {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(212, 160, 74, 0.3);
+  border-radius: 24px;
+  padding: 0.8rem 1.2rem;
+  color: #e8d5b7;
+  font-size: 1rem;
+  font-family: inherit;
+  text-align: center;
+  margin: 0.5rem 0 0.5rem;
+}
+
+.ouija-input:focus {
+  outline: none;
+  border-color: #d4a04a;
+  box-shadow: 0 0 12px rgba(212, 160, 74, 0.2);
+}
+
+.ouija-board { aspect-ratio: 10 / 8; }

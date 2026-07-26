@@ -131,6 +131,13 @@ const MysticApp = (function () {
       '<circle cx="24" cy="16" r="2"/>' +
       '<circle cx="24" cy="32" r="2" fill="currentColor"/>' +
       '</svg>',
+    ouija: svgOpen +
+      '<path d="M24,5 C35,13 41,24 39.5,35 C38,43 31.5,48 24,48 C16.5,48 10,43 8.5,35 C7,24 13,13 24,5 Z" transform="translate(0,-3)"/>' +
+      '<circle cx="24" cy="18" r="6"/>' +
+      '<circle cx="14" cy="34" r="1.4" fill="currentColor"/>' +
+      '<circle cx="34" cy="34" r="1.4" fill="currentColor"/>' +
+      '<circle cx="24" cy="40" r="1.4" fill="currentColor"/>' +
+      '</svg>',
     lock: svgOpen +
       '<rect x="13" y="21" width="22" height="19" rx="3"/>' +
       '<path d="M17,21 v-5 a7,7 0 0 1 14,0 v5"/>' +
@@ -142,6 +149,10 @@ const MysticApp = (function () {
   // --- Access control: horoscope is always free; the other oracles rotate,
   // one free per local day. Premium unlocks everything (flag is set by the
   // store purchase flow once billing is wired up).
+
+  // Master switch: true = every oracle unlocked, no badges, no paywall.
+  // Flip to false to re-enable the daily free-rotation model.
+  const FREE_FOR_ALL = true;
 
   const ALWAYS_FREE = ['horoscope', 'tarot'];
 
@@ -166,7 +177,7 @@ const MysticApp = (function () {
   }
 
   function isUnlocked(mod) {
-    return isPremium() || ALWAYS_FREE.includes(mod.id) || freeTodayModule().id === mod.id;
+    return FREE_FOR_ALL || isPremium() || ALWAYS_FREE.includes(mod.id) || freeTodayModule().id === mod.id;
   }
 
   function hoursToMidnight() {
@@ -242,7 +253,7 @@ const MysticApp = (function () {
       const tile = document.createElement('button');
       tile.className = 'home-tile' + (unlocked ? '' : ' locked');
       let badge = '';
-      if (!isPremium()) {
+      if (!FREE_FOR_ALL && !isPremium()) {
         if (mod.id === free.id || ALWAYS_FREE.includes(mod.id)) badge = '<div class="tile-badge free-badge">Free</div>';
         else if (!unlocked) badge = `<div class="tile-badge lock-badge">${icons.lock}</div>`;
       }
@@ -296,7 +307,9 @@ const MysticApp = (function () {
       'natal': 'Natal Chart',
       'biorhythm': 'Biorhythms',
       'lucky': 'Lucky Numbers',
-      'chinese': 'Chinese Zodiac'
+      'chinese': 'Chinese Zodiac',
+      'ouija': 'Spirit Board',
+      'spirit': 'Spirit Board'
     };
     const sub = window.location.hostname.split('.')[0];
     const targetName = subdomainMap[sub];
