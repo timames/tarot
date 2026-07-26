@@ -243,7 +243,7 @@ const MysticApp = (function () {
       tile.className = 'home-tile' + (unlocked ? '' : ' locked');
       let badge = '';
       if (!isPremium()) {
-        if (mod.id === free.id) badge = '<div class="tile-badge free-badge">Free today</div>';
+        if (mod.id === free.id || ALWAYS_FREE.includes(mod.id)) badge = '<div class="tile-badge free-badge">Free</div>';
         else if (!unlocked) badge = `<div class="tile-badge lock-badge">${icons.lock}</div>`;
       }
       tile.innerHTML = `
