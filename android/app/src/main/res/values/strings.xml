@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Mystic Tarot</string>
-    <string name="title_activity_main">Mystic Tarot</string>
+    <string name="app_name">Mystic Oracle</string>
+    <string name="title_activity_main">Mystic Oracle</string>
     <string name="package_name">net.ripdi.games.tarot</string>
     <string name="custom_url_scheme">net.ripdi.games.tarot</string>
 </resources>

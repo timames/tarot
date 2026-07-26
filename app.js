@@ -1,152 +1,162 @@
-// Starfield
-(function createStars() {
-  const container = document.getElementById('stars');
-  for (let i = 0; i < 80; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = Math.random() * 100 + '%';
-    star.style.top = Math.random() * 100 + '%';
-    star.style.setProperty('--dur', (1.5 + Math.random() * 3) + 's');
-    star.style.animationDelay = Math.random() * 3 + 's';
-    star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
-    container.appendChild(star);
+// Mystic Oracle — app shell, navigation, and shared helpers.
+// Modules register themselves via MysticApp.register() and render into #module-view.
+
+const MysticApp = (function () {
+  const modules = [];
+  let activeModule = null;
+
+  function register(mod) {
+    modules.push(mod);
   }
+
+  // --- Shared helpers -------------------------------------------------------
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function shuffle(arr, rng) {
+    const rand = rng || Math.random;
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  // Deterministic RNG so daily readings stay stable for the whole day.
+  function hashString(str) {
+    let h = 2166136261;
+    for (let i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = Math.imul(h, 16777619);
+    }
+    return h >>> 0;
+  }
+
+  function seededRng(seedStr) {
+    let a = hashString(seedStr);
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function todayKey() {
+    const d = new Date();
+    return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
+  }
+
+  function pick(arr, rng) {
+    return arr[Math.floor((rng || Math.random)() * arr.length)];
+  }
+
+  // Birth profile shared by numerology, natal chart, and biorhythm.
+  function getProfile() {
+    try {
+      return JSON.parse(localStorage.getItem('mystic-profile')) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function saveProfile(patch) {
+    const p = Object.assign(getProfile(), patch);
+    try { localStorage.setItem('mystic-profile', JSON.stringify(p)); } catch (e) {}
+    return p;
+  }
+
+  // --- Navigation -----------------------------------------------------------
+
+  const els = {};
+
+  function showHome() {
+    activeModule = null;
+    els.home.classList.remove('hidden');
+    els.view.classList.add('hidden');
+    els.back.classList.add('hidden');
+    els.title.textContent = 'Mystic Oracle';
+    els.subtitle.textContent = 'Ancient wisdom at your fingertips';
+    els.view.innerHTML = '';
+    window.scrollTo(0, 0);
+  }
+
+  function openModule(mod) {
+    activeModule = mod;
+    els.home.classList.add('hidden');
+    els.view.classList.remove('hidden');
+    els.back.classList.remove('hidden');
+    els.title.textContent = mod.name;
+    els.subtitle.textContent = mod.subtitle;
+    els.view.innerHTML = '';
+    mod.render(els.view);
+    window.scrollTo(0, 0);
+  }
+
+  function createStars() {
+    const container = document.getElementById('stars');
+    for (let i = 0; i < 80; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.setProperty('--dur', (1.5 + Math.random() * 3) + 's');
+      star.style.animationDelay = Math.random() * 3 + 's';
+      star.style.width = star.style.height = (1 + Math.random() * 2) + 'px';
+      container.appendChild(star);
+    }
+  }
+
+  function init() {
+    els.home = document.getElementById('home');
+    els.view = document.getElementById('module-view');
+    els.back = document.getElementById('btn-back');
+    els.title = document.getElementById('app-title');
+    els.subtitle = document.getElementById('app-subtitle');
+
+    createStars();
+
+    modules.forEach(mod => {
+      const tile = document.createElement('button');
+      tile.className = 'home-tile';
+      tile.innerHTML = `
+        <div class="home-tile-icon">${mod.icon}</div>
+        <div class="home-tile-name">${esc(mod.name)}</div>
+        <div class="home-tile-desc">${esc(mod.desc)}</div>
+      `;
+      tile.addEventListener('click', () => openModule(mod));
+      els.home.appendChild(tile);
+    });
+
+    els.back.addEventListener('click', showHome);
+
+    // Subdomain routing — auto-open module based on hostname
+    const subdomainMap = {
+      'tarot': 'Tarot',
+      'numerology': 'Numerology',
+      'astrology': 'Horoscope',
+      'iching': 'I Ching',
+      'runes': 'Runes',
+      'moon': 'Moon Phase',
+      'natal': 'Natal Chart',
+      'biorhythm': 'Biorhythms',
+      'lucky': 'Lucky Numbers'
+    };
+    const sub = window.location.hostname.split('.')[0];
+    const targetName = subdomainMap[sub];
+    const targetMod = targetName && modules.find(m => m.name === targetName);
+
+    if (targetMod) {
+      openModule(targetMod);
+    } else {
+      showHome();
+    }
+  }
+
+  return { register, init, esc, shuffle, seededRng, todayKey, pick, getProfile, saveProfile };
 })();
-
-const spreadSelect = document.getElementById('spread-select');
-const readingDiv = document.getElementById('reading');
-const cardsContainer = document.getElementById('cards-container');
-const interpretation = document.getElementById('interpretation');
-const btnNewReading = document.getElementById('btn-new-reading');
-
-let drawnCards = [];
-let spreadSize = 3;
-let flippedCount = 0;
-
-// Spread selection
-document.querySelectorAll('.spread-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    spreadSize = parseInt(btn.dataset.spread);
-    startReading();
-  });
-});
-
-btnNewReading.addEventListener('click', () => {
-  readingDiv.classList.add('hidden');
-  spreadSelect.classList.remove('hidden');
-  interpretation.classList.add('hidden');
-  btnNewReading.classList.add('hidden');
-});
-
-function shuffle(arr) {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-}
-
-function startReading() {
-  spreadSelect.classList.add('hidden');
-  readingDiv.classList.remove('hidden');
-  interpretation.classList.add('hidden');
-  btnNewReading.classList.add('hidden');
-  cardsContainer.innerHTML = '';
-  flippedCount = 0;
-
-  const shuffled = shuffle(TAROT_DECK);
-  drawnCards = shuffled.slice(0, spreadSize).map(card => ({
-    ...card,
-    isReversed: Math.random() < 0.3
-  }));
-
-  const labels = SPREAD_LABELS[spreadSize];
-
-  drawnCards.forEach((card, i) => {
-    const slot = document.createElement('div');
-    slot.className = 'card-slot';
-    slot.innerHTML = `
-      <div class="card ${card.isReversed ? 'reversed' : ''}" data-index="${i}">
-        <div class="card-face card-back">
-          <div class="card-back-pattern">
-            <div class="card-back-symbol">\u2726</div>
-          </div>
-        </div>
-        <div class="card-face card-front">
-          <div class="card-numeral">${card.numeral}</div>
-          <div class="card-illustration">${CARD_ART[card.name] || card.icon}</div>
-          <div class="card-title">${card.name}</div>
-          <div class="card-suit">${card.suit}${card.isReversed ? ' (Reversed)' : ''}</div>
-        </div>
-      </div>
-      <div class="card-slot-label">${labels[i]}</div>
-    `;
-
-    slot.addEventListener('click', () => flipCard(slot, i));
-    cardsContainer.appendChild(slot);
-  });
-}
-
-function flipCard(slot, index) {
-  const card = slot.querySelector('.card');
-  if (card.classList.contains('flipped')) return;
-
-  card.classList.add('flipped');
-  flippedCount++;
-
-  if (flippedCount === spreadSize) {
-    setTimeout(showInterpretation, 900);
-  }
-}
-
-function showInterpretation() {
-  const labels = SPREAD_LABELS[spreadSize];
-  let html = '';
-
-  drawnCards.forEach((card, i) => {
-    const meaning = card.isReversed ? card.reversed : card.upright;
-    html += `
-      <div class="interp-card">
-        <h3>${card.icon} ${card.name}</h3>
-        <div class="interp-position">${labels[i]}</div>
-        ${card.isReversed ? '<div class="interp-reversed">Reversed</div>' : ''}
-        <div class="interp-meaning">${meaning}</div>
-      </div>
-    `;
-  });
-
-  html += `
-    <div class="interp-summary">
-      <h3>Reading Summary</h3>
-      <p>${generateSummary()}</p>
-    </div>
-  `;
-
-  interpretation.innerHTML = html;
-  interpretation.classList.remove('hidden');
-  btnNewReading.classList.remove('hidden');
-}
-
-function generateSummary() {
-  const summaries = {
-    1: [
-      "This card speaks directly to your current moment. Let its wisdom guide your day.",
-      "The universe has a clear message for you today. Reflect on how this card resonates with your inner truth.",
-      "A single card, a single truth. Carry this insight with you as you move through your day."
-    ],
-    3: [
-      "Your past has shaped you, your present challenges you, and your future awaits your choices. The cards reveal a journey of transformation unfolding in your life.",
-      "The threads of time weave together in this reading. What was, what is, and what may be are all connected by the choices you make now.",
-      "These three cards paint a portrait of your journey. Honor where you've been, engage with where you are, and step boldly toward where you're going."
-    ],
-    5: [
-      "This cross spread reveals the deeper forces at play in your life. The visible and hidden influences converge to illuminate your path forward.",
-      "Five cards reveal five facets of your situation. Together they form a map of the energies, challenges, and potential that surround you now.",
-      "The cross illuminates what lies beneath the surface. Trust the wisdom of the cards as you navigate the complexities revealed in this reading."
-    ]
-  };
-
-  const options = summaries[spreadSize];
-  return options[Math.floor(Math.random() * options.length)];
-}
