@@ -363,12 +363,6 @@ h1 {
   display: none !important;
 }
 
-/* Ad banner space */
-.ad-banner {
-  height: 60px;
-  width: 100%;
-}
-
 /* Safe area for notched phones */
 body {
   padding-top: env(safe-area-inset-top);
