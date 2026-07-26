@@ -3,3 +3,5 @@ www/
 .wrangler/
 .DS_Store
 *.log
+*.keystore
+keystore.properties
