@@ -130,8 +130,75 @@ const MysticApp = (function () {
       '<path d="M24,8 a8,8 0 0 1 0,16 a8,8 0 0 0 0,16"/>' +
       '<circle cx="24" cy="16" r="2"/>' +
       '<circle cx="24" cy="32" r="2" fill="currentColor"/>' +
+      '</svg>',
+    lock: svgOpen +
+      '<rect x="13" y="21" width="22" height="19" rx="3"/>' +
+      '<path d="M17,21 v-5 a7,7 0 0 1 14,0 v5"/>' +
+      '<circle cx="24" cy="29" r="2.5"/>' +
+      '<path d="M24,31.5 V35"/>' +
       '</svg>'
   };
+
+  // --- Access control: horoscope is always free; the other oracles rotate,
+  // one free per local day. Premium unlocks everything (flag is set by the
+  // store purchase flow once billing is wired up).
+
+  const ALWAYS_FREE = ['horoscope'];
+
+  function isPremium() {
+    try { return localStorage.getItem('mystic-premium') === '1'; } catch (e) { return false; }
+  }
+
+  function unlockPremium() {
+    try { localStorage.setItem('mystic-premium', '1'); } catch (e) {}
+    buildHome();
+    showHome();
+  }
+
+  function rotatables() {
+    return modules.filter(m => !ALWAYS_FREE.includes(m.id));
+  }
+
+  function freeTodayModule() {
+    const localDay = Math.floor(new Date(new Date().toDateString()).getTime() / 86400e3);
+    const r = rotatables();
+    return r[((localDay % r.length) + r.length) % r.length];
+  }
+
+  function isUnlocked(mod) {
+    return isPremium() || ALWAYS_FREE.includes(mod.id) || freeTodayModule().id === mod.id;
+  }
+
+  function hoursToMidnight() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const mins = Math.round((midnight - now) / 60000);
+    return `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}m`;
+  }
+
+  function renderPaywall(mod) {
+    const free = freeTodayModule();
+    els.view.innerHTML = `
+      <div class="paywall">
+        <div class="paywall-lock">${icons.lock}</div>
+        <h2>The veil is drawn</h2>
+        <p class="paywall-text">Each day, one oracle opens its doors freely.
+        Today the <b>${esc(free.name)}</b> awaits — <b>${esc(mod.name)}</b> will take its turn soon.</p>
+        <button class="btn-primary" id="btn-goto-free">Visit ${esc(free.name)}</button>
+        <div class="paywall-countdown">Next oracle opens in ${hoursToMidnight()}</div>
+        <div class="paywall-plus">
+          <h3>Mystic Oracle Plus</h3>
+          <p>Every oracle, every day, no ads — yours forever.</p>
+          <button class="btn-ghost" id="btn-plus">Coming soon</button>
+        </div>
+      </div>
+    `;
+    els.view.querySelector('#btn-goto-free').addEventListener('click', () => openModule(free));
+    els.view.querySelector('#btn-plus').addEventListener('click', function () {
+      this.textContent = 'Available in a coming update ✦';
+    });
+  }
 
   // --- Navigation -----------------------------------------------------------
 
@@ -155,11 +222,39 @@ const MysticApp = (function () {
     els.view.classList.remove('hidden');
     els.back.classList.remove('hidden');
     els.title.textContent = mod.name;
-    els.subtitle.textContent = mod.subtitle;
     els.view.innerHTML = '';
     if (els.footer) els.footer.classList.add('hidden');
-    mod.render(els.view);
+    if (!isUnlocked(mod)) {
+      els.subtitle.textContent = 'This oracle rests today';
+      renderPaywall(mod);
+    } else {
+      els.subtitle.textContent = mod.subtitle;
+      mod.render(els.view);
+    }
     window.scrollTo(0, 0);
+  }
+
+  function buildHome() {
+    els.home.innerHTML = '';
+    const free = freeTodayModule();
+    modules.forEach(mod => {
+      const unlocked = isUnlocked(mod);
+      const tile = document.createElement('button');
+      tile.className = 'home-tile' + (unlocked ? '' : ' locked');
+      let badge = '';
+      if (!isPremium()) {
+        if (mod.id === free.id) badge = '<div class="tile-badge free-badge">Free today</div>';
+        else if (!unlocked) badge = `<div class="tile-badge lock-badge">${icons.lock}</div>`;
+      }
+      tile.innerHTML = `
+        ${badge}
+        <div class="home-tile-icon">${mod.icon}</div>
+        <div class="home-tile-name">${esc(mod.name)}</div>
+        <div class="home-tile-desc">${esc(mod.desc)}</div>
+      `;
+      tile.addEventListener('click', () => openModule(mod));
+      els.home.appendChild(tile);
+    });
   }
 
   function createStars() {
@@ -185,18 +280,7 @@ const MysticApp = (function () {
     els.footer = document.querySelector('.app-footer');
 
     createStars();
-
-    modules.forEach(mod => {
-      const tile = document.createElement('button');
-      tile.className = 'home-tile';
-      tile.innerHTML = `
-        <div class="home-tile-icon">${mod.icon}</div>
-        <div class="home-tile-name">${esc(mod.name)}</div>
-        <div class="home-tile-desc">${esc(mod.desc)}</div>
-      `;
-      tile.addEventListener('click', () => openModule(mod));
-      els.home.appendChild(tile);
-    });
+    buildHome();
 
     els.back.addEventListener('click', showHome);
 
@@ -225,5 +309,5 @@ const MysticApp = (function () {
     }
   }
 
-  return { register, init, esc, shuffle, seededRng, todayKey, pick, getProfile, saveProfile, icons };
+  return { register, init, esc, shuffle, seededRng, todayKey, pick, getProfile, saveProfile, icons, isPremium, unlockPremium, freeTodayModule };
 })();

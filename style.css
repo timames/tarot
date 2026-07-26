@@ -1024,3 +1024,120 @@ h1, h2, h3,
   }
   .star { display: none; }
 }
+
+/* ===== Freemium rotation ===== */
+
+.home-tile { position: relative; overflow: hidden; }
+
+.home-tile.locked .home-tile-icon,
+.home-tile.locked .home-tile-name,
+.home-tile.locked .home-tile-desc {
+  opacity: 0.42;
+}
+
+.tile-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.free-badge {
+  background: linear-gradient(160deg, #e3b96a, #c08c2e);
+  color: #221304;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(212, 160, 74, 0.4);
+}
+
+.lock-badge {
+  color: rgba(212, 160, 74, 0.85);
+}
+
+.lock-badge svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Paywall */
+.paywall {
+  max-width: 430px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.paywall-lock {
+  color: #d4a04a;
+  margin-bottom: 1rem;
+}
+
+.paywall-lock svg {
+  width: 58px;
+  height: 58px;
+  filter: drop-shadow(0 0 14px rgba(212, 160, 74, 0.4));
+}
+
+.paywall h2 {
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  font-size: 1.5rem;
+  margin-bottom: 0.9rem;
+}
+
+.paywall-text {
+  color: #c4b8a0;
+  line-height: 1.7;
+}
+
+.paywall-text b { color: #d4a04a; }
+
+.paywall-countdown {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #ab9ec4;
+  margin: -0.5rem 0 2rem;
+}
+
+.paywall-plus {
+  background: rgba(212, 160, 74, 0.08);
+  border: 1px solid rgba(212, 160, 74, 0.25);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.paywall-plus h3 {
+  color: #d4a04a;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+}
+
+.paywall-plus p {
+  color: #c4b8a0;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.1rem;
+}
+
+.btn-ghost {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: transparent;
+  border: 1px solid rgba(212, 160, 74, 0.5);
+  color: #d4a04a;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.btn-ghost:hover {
+  background: rgba(212, 160, 74, 0.12);
+  border-color: #d4a04a;
+}
