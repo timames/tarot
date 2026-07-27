@@ -765,24 +765,6 @@ header { position: relative; }
 .moon-svg { width: 160px; height: 160px; filter: drop-shadow(0 0 25px rgba(232, 213, 183, 0.15)); }
 .moon-display h2 { font-weight: 300; letter-spacing: 0.2em; margin-top: 0.75rem; }
 
-/* Biorhythm */
-.bio-chart { background: rgba(255,255,255,0.03); border: 1px solid rgba(212,160,74,0.15); border-radius: 12px; }
-.bio-axis { stroke: rgba(232, 213, 183, 0.25); stroke-width: 1; }
-.bio-today { stroke: rgba(212, 160, 74, 0.6); stroke-width: 1; stroke-dasharray: 4 4; }
-.bio-today-label { fill: #9a8bb0; font-size: 9px; letter-spacing: 0.1em; }
-
-.bio-legend {
-  display: flex;
-  justify-content: center;
-  gap: 1.25rem;
-  margin: 0.75rem 0 1.25rem;
-  font-size: 0.8rem;
-  color: #c4b8a0;
-}
-
-.bio-key { display: flex; align-items: center; gap: 0.4rem; }
-.bio-swatch { width: 14px; height: 4px; border-radius: 2px; display: inline-block; }
-
 
 @media (max-width: 600px) {
   .home-grid { grid-template-columns: repeat(2, 1fr); }

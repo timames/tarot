@@ -56,7 +56,7 @@ const MysticApp = (function () {
     return arr[Math.floor((rng || Math.random)() * arr.length)];
   }
 
-  // Birth profile shared by numerology, natal chart, and biorhythm.
+  // Birth profile shared by numerology and natal chart.
   function getProfile() {
     try {
       return JSON.parse(localStorage.getItem('mystic-profile')) || {};
@@ -115,11 +115,6 @@ const MysticApp = (function () {
     moon: svgOpen +
       '<path d="M29,8 A16.5,16.5 0 1,0 29,40 A13,13 0 1,1 29,8 Z"/>' +
       '<path d="M36,14 v4 M34,16 h4 M39,26 v3 M37.5,27.5 h3"/>' +
-      '</svg>',
-    biorhythm: svgOpen +
-      '<path d="M6,24 H42" opacity="0.45"/>' +
-      '<path d="M6,24 C12,10 18,10 24,24 C30,38 36,38 42,24"/>' +
-      '<path d="M6,24 C12,38 18,38 24,24 C30,10 36,10 42,24"/>' +
       '</svg>',
     lucky: svgOpen +
       '<circle cx="24" cy="24" r="17"/>' +
@@ -305,7 +300,6 @@ const MysticApp = (function () {
       'runes': 'Runes',
       'moon': 'Moon Phase',
       'natal': 'Natal Chart',
-      'biorhythm': 'Biorhythms',
       'lucky': 'Lucky Numbers',
       'chinese': 'Chinese Zodiac',
       'ouija': 'Spirit Board',
