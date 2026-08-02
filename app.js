@@ -71,6 +71,26 @@ const MysticApp = (function () {
     return p;
   }
 
+  // Sun sign from a 'YYYY-MM-DD' string. Boundaries match ZODIAC_SIGNS.
+  const SIGN_BOUNDS = [
+    [120, 'Capricorn'], [219, 'Aquarius'], [321, 'Pisces'], [420, 'Aries'],
+    [521, 'Taurus'], [621, 'Gemini'], [723, 'Cancer'], [823, 'Leo'],
+    [923, 'Virgo'], [1023, 'Libra'], [1122, 'Scorpio'], [1222, 'Sagittarius'],
+    [1232, 'Capricorn']
+  ];
+
+  function sunSign(dateStr) {
+    if (!dateStr) return null;
+    const parts = String(dateStr).split('-').map(Number);
+    const m = parts[1], d = parts[2];
+    if (!m || !d) return null;
+    const md = m * 100 + d;
+    for (let i = 0; i < SIGN_BOUNDS.length; i++) {
+      if (md < SIGN_BOUNDS[i][0]) return SIGN_BOUNDS[i][1];
+    }
+    return 'Capricorn';
+  }
+
   // --- Occult icon set (gold line-art, stroke follows currentColor) ---------
 
   const svgOpen = '<svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">';
@@ -133,77 +153,176 @@ const MysticApp = (function () {
       '<circle cx="34" cy="34" r="1.4" fill="currentColor"/>' +
       '<circle cx="24" cy="40" r="1.4" fill="currentColor"/>' +
       '</svg>',
-    lock: svgOpen +
-      '<rect x="13" y="21" width="22" height="19" rx="3"/>' +
-      '<path d="M17,21 v-5 a7,7 0 0 1 14,0 v5"/>' +
-      '<circle cx="24" cy="29" r="2.5"/>' +
-      '<path d="M24,31.5 V35"/>' +
+    gear: svgOpen +
+      '<circle cx="24" cy="24" r="6.5"/>' +
+      '<circle cx="24" cy="24" r="12.5"/>' +
+      Array.from({ length: 8 }, (_, i) => {
+        const a = i * Math.PI / 4;
+        const x1 = 24 + 12.5 * Math.cos(a), y1 = 24 + 12.5 * Math.sin(a);
+        const x2 = 24 + 17.5 * Math.cos(a), y2 = 24 + 17.5 * Math.sin(a);
+        return `<path d="M${x1.toFixed(1)},${y1.toFixed(1)} L${x2.toFixed(1)},${y2.toFixed(1)}"/>`;
+      }).join('') +
+      '</svg>',
+    play: svgOpen +
+      '<circle cx="24" cy="24" r="17"/>' +
+      '<path d="M20,17 L33,24 L20,31 Z" fill="currentColor" stroke="none"/>' +
+      '</svg>',
+    star: svgOpen +
+      '<path d="M24,6 L29.5,18.5 L43,20 L33,29.5 L35.8,43 L24,36 L12.2,43 L15,29.5 L5,20 L18.5,18.5 Z"/>' +
       '</svg>'
   };
 
-  // --- Access control: horoscope is always free; the other oracles rotate,
-  // one free per local day. Premium unlocks everything (flag is set by the
-  // store purchase flow once billing is wired up).
+  // --- Access model ---------------------------------------------------------
+  //
+  // Three tiers (set at launch — see monetization plan):
+  //   FREE_MODULES     — open to everyone (banner ad only). Sub-features inside
+  //                      these may still be rewarded/Plus (handled by the module).
+  //   PLUS_MODULES     — subscription only ("Mystic Oracle Plus").
+  //   everything else  — REWARDED: watch one rewarded ad to unlock for the day,
+  //                      or free with Plus.
+  //
+  // Premium status is owned by billing.js, which writes localStorage
+  // 'mystic-premium' = '1' whenever the RevenueCat "plus" entitlement is active.
+  // Everything here reads it synchronously via isPremium().
 
-  // Master switch: true = every oracle unlocked, no badges, no paywall.
-  // Flip to false to re-enable the daily free-rotation model.
-  const FREE_FOR_ALL = true;
+  const FREE_MODULES = ['horoscope', 'tarot'];
+  const PLUS_MODULES = ['natal'];
 
-  const ALWAYS_FREE = ['horoscope', 'tarot'];
+  function tierOf(mod) {
+    if (FREE_MODULES.includes(mod.id)) return 'free';
+    if (PLUS_MODULES.includes(mod.id)) return 'plus';
+    return 'rewarded';
+  }
 
   function isPremium() {
     try { return localStorage.getItem('mystic-premium') === '1'; } catch (e) { return false; }
   }
 
-  function unlockPremium() {
-    try { localStorage.setItem('mystic-premium', '1'); } catch (e) {}
-    buildHome();
-    showHome();
+  // Called by billing.js after checking the RevenueCat entitlement.
+  function applyPremium(active) {
+    try {
+      if (active) localStorage.setItem('mystic-premium', '1');
+      else localStorage.removeItem('mystic-premium');
+    } catch (e) {}
+    if (active && MysticApp.hideAds) MysticApp.hideAds();
+    if (els.home) { buildHome(); if (!activeModule) showHome(); }
   }
 
-  function rotatables() {
-    return modules.filter(m => !ALWAYS_FREE.includes(m.id));
-  }
+  // Legacy name kept for the old "unlock" flow / manual testing.
+  function unlockPremium() { applyPremium(true); }
 
-  function freeTodayModule() {
-    const localDay = Math.floor(new Date(new Date().toDateString()).getTime() / 86400e3);
-    const r = rotatables();
-    return r[((localDay % r.length) + r.length) % r.length];
+  // Rewarded-ad unlocks are remembered per module for the current calendar day.
+  function adUnlockedToday(id) {
+    try { return localStorage.getItem('mystic-ad-' + id) === todayKey(); } catch (e) { return false; }
+  }
+  function grantAdUnlock(id) {
+    try { localStorage.setItem('mystic-ad-' + id, todayKey()); } catch (e) {}
   }
 
   function isUnlocked(mod) {
-    return FREE_FOR_ALL || isPremium() || ALWAYS_FREE.includes(mod.id) || freeTodayModule().id === mod.id;
+    const t = tierOf(mod);
+    if (t === 'free') return true;
+    if (isPremium()) return true;
+    if (t === 'plus') return false;
+    return adUnlockedToday(mod.id); // rewarded
   }
 
-  function hoursToMidnight() {
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    const mins = Math.round((midnight - now) / 60000);
-    return `${Math.floor(mins / 60)}h ${String(mins % 60).padStart(2, '0')}m`;
-  }
+  // --- Gate screens ---------------------------------------------------------
 
-  function renderPaywall(mod) {
-    const free = freeTodayModule();
+  // Shown for a REWARDED oracle the user hasn't unlocked today.
+  function renderRewardGate(mod) {
+    els.subtitle.textContent = 'Unlock today’s reading';
     els.view.innerHTML = `
-      <div class="paywall">
-        <div class="paywall-lock">${icons.lock}</div>
-        <h2>The veil is drawn</h2>
-        <p class="paywall-text">Each day, one oracle opens its doors freely.
-        Today the <b>${esc(free.name)}</b> awaits — <b>${esc(mod.name)}</b> will take its turn soon.</p>
-        <button class="btn-primary" id="btn-goto-free">Visit ${esc(free.name)}</button>
-        <div class="paywall-countdown">Next oracle opens in ${hoursToMidnight()}</div>
-        <div class="paywall-plus">
+      <div class="gate reward-gate">
+        <div class="gate-icon">${mod.icon}</div>
+        <h2>${esc(mod.name)}</h2>
+        <p class="gate-text">Watch a short video to unlock <b>${esc(mod.name)}</b> for the rest of today — free.</p>
+        <button class="btn-primary gate-btn" id="btn-watch">${icons.play}<span>Watch &amp; Unlock</span></button>
+        <div class="gate-or">or</div>
+        <div class="gate-plus">
           <h3>Mystic Oracle Plus</h3>
-          <p>Every oracle, every day, no ads — yours forever.</p>
-          <button class="btn-ghost" id="btn-plus">Coming soon</button>
+          <p>Unlock every oracle, remove all ads, and open the monthly &amp; yearly horoscopes and natal chart.</p>
+          <button class="btn-ghost" id="btn-gate-plus">See Plus</button>
         </div>
-      </div>
-    `;
-    els.view.querySelector('#btn-goto-free').addEventListener('click', () => openModule(free));
-    els.view.querySelector('#btn-plus').addEventListener('click', function () {
-      this.textContent = 'Available in a coming update ✦';
+      </div>`;
+
+    const watchBtn = els.view.querySelector('#btn-watch');
+    watchBtn.addEventListener('click', function () {
+      watchBtn.disabled = true;
+      watchBtn.innerHTML = icons.play + '<span>Loading…</span>';
+      const onReward = () => { grantAdUnlock(mod.id); openModule(mod); };
+      if (MysticApp.showRewardedAd) {
+        MysticApp.showRewardedAd(onReward, () => {
+          watchBtn.disabled = false;
+          watchBtn.innerHTML = icons.play + '<span>Watch &amp; Unlock</span>';
+          if (!els.view.querySelector('.gate-err')) {
+            watchBtn.insertAdjacentHTML('afterend',
+              '<div class="gate-err">No ad available right now — please try again in a moment.</div>');
+          }
+        });
+      } else {
+        // Web / no native ads: unlock so the flow can be tested.
+        onReward();
+      }
     });
+    els.view.querySelector('#btn-gate-plus').addEventListener('click', () => openSubscribe());
+  }
+
+  // Shown for a PLUS-only oracle when the user isn't subscribed.
+  function renderPlusPaywall(mod) {
+    els.subtitle.textContent = 'A Mystic Oracle Plus feature';
+    els.view.innerHTML = `
+      <div class="gate plus-gate">
+        <div class="gate-icon">${mod.icon}</div>
+        <h2>${esc(mod.name)}</h2>
+        <p class="gate-text"><b>${esc(mod.name)}</b> is part of <b>Mystic Oracle Plus</b>.</p>
+        <button class="btn-primary gate-btn" id="btn-paywall-plus">${icons.star}<span>Unlock with Plus</span></button>
+        <div class="gate-restore"><button class="link-btn" id="btn-restore">Restore purchase</button></div>
+      </div>`;
+    els.view.querySelector('#btn-paywall-plus').addEventListener('click', () => openSubscribe());
+    const restore = els.view.querySelector('#btn-restore');
+    restore.addEventListener('click', function () {
+      restore.textContent = 'Restoring…';
+      if (MysticApp.billing && MysticApp.billing.restore) {
+        MysticApp.billing.restore().then(active => {
+          if (active) openModule(mod);
+          else restore.textContent = 'No purchase found';
+        });
+      } else { restore.textContent = 'Not available here'; }
+    });
+  }
+
+  // Full "Mystic Oracle Plus" subscribe screen. billing.js overrides this with
+  // one wired to live RevenueCat offerings; this is the fallback shell.
+  function defaultSubscribe() {
+    activeModule = { id: '__subscribe__', name: 'Mystic Oracle Plus' };
+    els.home.classList.add('hidden');
+    els.view.classList.remove('hidden');
+    els.back.classList.remove('hidden');
+    els.title.textContent = 'Mystic Oracle Plus';
+    els.subtitle.textContent = 'Every oracle, no ads';
+    if (els.footer) els.footer.classList.add('hidden');
+    els.view.innerHTML = `
+      <div class="subscribe">
+        <div class="sub-crown">${icons.star}</div>
+        <h2>Mystic Oracle Plus</h2>
+        <ul class="sub-benefits">
+          <li>Every oracle unlocked, every day</li>
+          <li>No ads, anywhere</li>
+          <li>Monthly &amp; yearly horoscopes</li>
+          <li>Full natal chart, Tree of Life &amp; Grand Tableau spreads</li>
+        </ul>
+        <div class="sub-note">Subscriptions will be available in the store build. (This preview build has no billing configured.)</div>
+        <button class="link-btn" id="sub-restore">Restore purchase</button>
+      </div>`;
+    const r = els.view.querySelector('#sub-restore');
+    if (r) r.addEventListener('click', () => { r.textContent = 'Not available here'; });
+    window.scrollTo(0, 0);
+  }
+
+  function openSubscribe() {
+    if (MysticApp.billing && MysticApp.billing.openSubscribe) MysticApp.billing.openSubscribe();
+    else defaultSubscribe();
   }
 
   // --- Navigation -----------------------------------------------------------
@@ -219,6 +338,7 @@ const MysticApp = (function () {
     els.subtitle.textContent = 'Ancient wisdom at your fingertips';
     els.view.innerHTML = '';
     if (els.footer) els.footer.classList.remove('hidden');
+    if (els.settings) els.settings.classList.remove('hidden');
     window.scrollTo(0, 0);
   }
 
@@ -230,28 +350,36 @@ const MysticApp = (function () {
     els.title.textContent = mod.name;
     els.view.innerHTML = '';
     if (els.footer) els.footer.classList.add('hidden');
-    if (!isUnlocked(mod)) {
-      els.subtitle.textContent = 'This oracle rests today';
-      renderPaywall(mod);
-    } else {
+
+    if (isUnlocked(mod)) {
       els.subtitle.textContent = mod.subtitle;
       mod.render(els.view);
+    } else if (tierOf(mod) === 'plus') {
+      renderPlusPaywall(mod);
+    } else {
+      renderRewardGate(mod);
     }
     window.scrollTo(0, 0);
   }
 
   function buildHome() {
     els.home.innerHTML = '';
-    const free = freeTodayModule();
+    const premium = isPremium();
     modules.forEach(mod => {
+      const t = tierOf(mod);
       const unlocked = isUnlocked(mod);
       const tile = document.createElement('button');
-      tile.className = 'home-tile' + (unlocked ? '' : ' locked');
+      tile.className = 'home-tile' + (unlocked || premium ? '' : ' locked');
+
       let badge = '';
-      if (!FREE_FOR_ALL && !isPremium()) {
-        if (mod.id === free.id || ALWAYS_FREE.includes(mod.id)) badge = '<div class="tile-badge free-badge">Free</div>';
-        else if (!unlocked) badge = `<div class="tile-badge lock-badge">${icons.lock}</div>`;
+      if (!premium) {
+        if (t === 'plus') {
+          badge = `<div class="tile-badge plus-badge">${icons.star}<span>Plus</span></div>`;
+        } else if (t === 'rewarded' && !unlocked) {
+          badge = `<div class="tile-badge ad-badge">${icons.play}<span>Ad</span></div>`;
+        }
       }
+
       tile.innerHTML = `
         ${badge}
         <div class="home-tile-icon">${mod.icon}</div>
@@ -261,6 +389,90 @@ const MysticApp = (function () {
       tile.addEventListener('click', () => openModule(mod));
       els.home.appendChild(tile);
     });
+
+    // A slim "Go Plus" call-to-action under the grid for non-subscribers.
+    if (!premium) {
+      const cta = document.createElement('button');
+      cta.className = 'home-plus-cta';
+      cta.innerHTML = `${icons.star}<span>Get Mystic Oracle Plus — every oracle, no ads</span>`;
+      cta.addEventListener('click', () => openSubscribe());
+      els.home.appendChild(cta);
+    }
+  }
+
+  // --- First-run onboarding -------------------------------------------------
+  // Asked once. Everything here is optional — Skip must always work.
+
+  function renderOnboarding() {
+    els.home.classList.add('hidden');
+    els.view.classList.remove('hidden');
+    els.back.classList.add('hidden');
+    if (els.settings) els.settings.classList.add('hidden');
+    if (els.footer) els.footer.classList.add('hidden');
+    els.title.textContent = 'Welcome';
+    els.subtitle.textContent = 'A moment, and the oracle knows you';
+
+    els.view.innerHTML = `
+      <div class="onboard">
+        <div class="onboard-mark">${icons.star}</div>
+        <p class="onboard-lead">Tell the oracle a little about you and your readings arrive
+        already tuned — your horoscope opens on your own sign, and your numbers and chart
+        are ready when you want them.</p>
+        <form class="mystic-form" id="ob-form">
+          <label>Your name <span class="ob-optional">optional</span>
+            <input type="text" id="ob-name" placeholder="What shall we call you?" autocomplete="off">
+          </label>
+          <label>Birth date <span class="ob-optional">optional</span>
+            <input type="date" id="ob-dob">
+          </label>
+          <div class="ob-sign hidden" id="ob-sign"></div>
+          <label class="ob-check">
+            <input type="checkbox" id="ob-notify" checked>
+            <span>Remind me each day, and warn me before a multi-day spread breaks</span>
+          </label>
+          <button type="submit" class="btn-primary">Begin</button>
+        </form>
+        <button class="link-btn" id="ob-skip">Skip for now</button>
+      </div>`;
+
+    const dob = els.view.querySelector('#ob-dob');
+    const signEl = els.view.querySelector('#ob-sign');
+    dob.addEventListener('change', function () {
+      const s = sunSign(this.value);
+      if (s) {
+        signEl.textContent = 'You are ' + s + ' ✦';
+        signEl.classList.remove('hidden');
+      } else {
+        signEl.classList.add('hidden');
+      }
+    });
+
+    function finish(patch) {
+      saveProfile(Object.assign({ onboarded: true }, patch));
+      if (els.settings) els.settings.classList.remove('hidden');
+      buildHome();
+      showHome();
+    }
+
+    els.view.querySelector('#ob-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const name = els.view.querySelector('#ob-name').value.trim();
+      const birthDate = dob.value;
+      const wantsNotify = els.view.querySelector('#ob-notify').checked;
+      const patch = {};
+      if (name) patch.fullName = name;
+      if (birthDate) {
+        patch.birthDate = birthDate;
+        const s = sunSign(birthDate);
+        if (s) patch.sign = s;
+      }
+      if (wantsNotify && MysticApp.notify) MysticApp.notify.enable();
+      else if (MysticApp.notify) MysticApp.notify.setDaily(false);
+      finish(patch);
+    });
+
+    els.view.querySelector('#ob-skip').addEventListener('click', () => finish({}));
+    window.scrollTo(0, 0);
   }
 
   function createStars() {
@@ -281,6 +493,7 @@ const MysticApp = (function () {
     els.home = document.getElementById('home');
     els.view = document.getElementById('module-view');
     els.back = document.getElementById('btn-back');
+    els.settings = document.getElementById('btn-settings');
     els.title = document.getElementById('app-title');
     els.subtitle = document.getElementById('app-subtitle');
     els.footer = document.querySelector('.app-footer');
@@ -289,6 +502,13 @@ const MysticApp = (function () {
     buildHome();
 
     els.back.addEventListener('click', showHome);
+
+    if (els.settings) {
+      els.settings.innerHTML = icons.gear;
+      els.settings.addEventListener('click', function () {
+        if (MysticApp.settings) MysticApp.settings.open();
+      });
+    }
 
     // Subdomain routing — auto-open module based on hostname
     // Note: no 'tarot' entry — tarot.ripdi.net is the main site domain
@@ -303,7 +523,7 @@ const MysticApp = (function () {
       'lucky': 'Lucky Numbers',
       'chinese': 'Chinese Zodiac',
       'ouija': 'Spirit Board',
-      'spirit': 'Spirit Board'
+      'spirit': 'Spirit Board',
     };
     const sub = window.location.hostname.split('.')[0];
     const targetName = subdomainMap[sub];
@@ -311,10 +531,19 @@ const MysticApp = (function () {
 
     if (targetMod) {
       openModule(targetMod);
+    } else if (!getProfile().onboarded) {
+      renderOnboarding();
     } else {
       showHome();
     }
   }
 
-  return { register, init, esc, shuffle, seededRng, todayKey, pick, getProfile, saveProfile, icons, isPremium, unlockPremium, freeTodayModule };
+  return {
+    register, init, esc, shuffle, seededRng, todayKey, pick,
+    getProfile, saveProfile, sunSign, icons,
+    isPremium, applyPremium, unlockPremium,
+    adUnlockedToday, grantAdUnlock,
+    openModule, showHome, openSubscribe,
+    refresh: function () { if (els.home) { buildHome(); if (!activeModule) showHome(); } }
+  };
 })();

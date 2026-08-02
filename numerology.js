@@ -98,6 +98,7 @@
       const el = container.querySelector('#num-result');
       el.innerHTML = html;
       el.scrollIntoView({ behavior: 'smooth' });
+      if (MysticApp.adReadingDone) MysticApp.adReadingDone();
     });
   }
 

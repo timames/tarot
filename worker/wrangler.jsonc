@@ -1,0 +1,23 @@
+{
+  // Mystic Oracle AI worker.
+  //   npx wrangler kv namespace create ORACLE_KV   -> paste the id below
+  //   npx wrangler deploy
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "mystic-oracle-ai",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-01",
+
+  // Workers AI. This is a binding, not an API key — nothing secret ships anywhere.
+  "ai": { "binding": "AI" },
+
+  // Cache for the pre-generated horoscopes.
+  "kv_namespaces": [
+    { "binding": "ORACLE_KV", "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" }
+  ],
+
+  // 03:15 UTC daily. Writes today + tomorrow so every timezone has content ready;
+  // also refreshes the month on the 1st and the year on Jan 1.
+  "triggers": { "crons": ["15 3 * * *"] },
+
+  "observability": { "enabled": true }
+}

@@ -4,7 +4,8 @@ const fs = require('fs');
 const path = require('path');
 
 const FILES = [
-  'index.html', 'style.css', 'app.js', 'cards.js', 'art.js', 'tarot.js',
+  'index.html', 'style.css', 'app.js', 'billing.js', 'notify.js', 'ai.js', 'settings.js',
+  'cards.js', 'art.js', 'tarot.js',
   'horoscope.js', 'natal.js', 'nature.js', 'numerology.js', 'iching.js',
   'runes.js', 'moon.js', 'lucky.js', 'chinese.js',
   'cities.js', 'ouija.js', 'ads.js'

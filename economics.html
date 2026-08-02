@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mystic Oracle — Unit Economics</title>
+<style>
+  .viz-root {
+    color-scheme: light;
+    --surface-1: #fcfcfb;
+    --page: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --grid: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --series-1: #2a78d6;
+    --series-2: #eb6834;
+    --series-3: #1baf7a;
+    --series-4: #eda100;
+    --seq-400: #3987e5;
+    --seq-500: #256abf;
+    --seq-600: #184f95;
+    --good: #0ca30c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) .viz-root {
+      color-scheme: dark;
+      --surface-1: #1a1a19; --page: #0d0d0d;
+      --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+      --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+      --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+      --seq-400: #3987e5; --seq-500: #256abf; --seq-600: #184f95;
+      --good: #0ca30c;
+    }
+  }
+  :root[data-theme="dark"] .viz-root {
+    color-scheme: dark;
+    --surface-1: #1a1a19; --page: #0d0d0d;
+    --text-primary: #ffffff; --text-secondary: #c3c2b7; --text-muted: #898781;
+    --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+    --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+    --seq-400: #3987e5; --seq-500: #256abf; --seq-600: #184f95;
+    --good: #0ca30c;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background: #0d0d0d; }
+  /* colour must be set on .viz-root, not body — the tokens are scoped here, so
+     anything inheriting from body would fall back to the UA default instead. */
+  .viz-root {
+    background: var(--page); color: var(--text-primary);
+    min-height: 100vh; padding: 28px 20px 60px;
+  }
+  :root[data-theme="light"] body { background: #f9f9f7; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 22px; }
+  h1 { font-size: 1.35rem; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .sub { color: var(--text-secondary); font-size: 0.88rem; margin: 0; max-width: 62ch; line-height: 1.5; }
+  .theme-btn {
+    background: var(--surface-1); border: 1px solid var(--border); color: var(--text-secondary);
+    border-radius: 8px; padding: 7px 12px; font: inherit; font-size: 0.8rem; cursor: pointer; white-space: nowrap;
+  }
+  .theme-btn:hover { color: var(--text-primary); }
+
+  .card {
+    background: var(--surface-1); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; margin-bottom: 16px;
+  }
+  h2 { font-size: 0.95rem; font-weight: 600; margin: 0 0 2px; }
+  .card-sub { color: var(--text-secondary); font-size: 0.8rem; margin: 0 0 18px; line-height: 1.5; }
+
+  /* hero */
+  .hero-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px 20px; margin-bottom: 6px; }
+  .hero-label { color: var(--text-secondary); font-size: 0.82rem; }
+  .hero-value { font-size: 3rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1; }
+  .hero-note { color: var(--text-muted); font-size: 0.8rem; }
+
+  /* KPI */
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(168px, 1fr)); gap: 14px; }
+  .kpi { border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+  .kpi-label { color: var(--text-secondary); font-size: 0.76rem; margin-bottom: 7px; line-height: 1.35; }
+  .kpi-value { font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; }
+  .kpi-note { color: var(--text-muted); font-size: 0.72rem; margin-top: 5px; line-height: 1.4; }
+  .kpi-value.zero { color: var(--good); }
+
+  /* controls */
+  .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px 22px; }
+  .ctrl-label { display: flex; justify-content: space-between; align-items: baseline; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 7px; gap: 10px; }
+  .ctrl-val { color: var(--text-primary); font-weight: 600; font-variant-numeric: tabular-nums; }
+  input[type=range] { width: 100%; accent-color: var(--seq-400); margin: 0; }
+
+  /* stacked bar */
+  .stack { display: flex; width: 100%; height: 40px; gap: 2px; margin: 6px 0 14px; }
+  .seg { position: relative; min-width: 2px; display: flex; align-items: center; justify-content: center; overflow: visible; }
+  .seg-1 { background: var(--series-1); }
+  .seg-2 { background: var(--series-2); }
+  .seg-3 { background: var(--series-3); }
+  .seg-4 { background: var(--series-4); }
+  .stack .seg:first-child { border-radius: 4px 0 0 4px; }
+  .stack .seg:last-child  { border-radius: 0 4px 4px 0; }
+  .seg-label { font-size: 0.72rem; font-weight: 600; white-space: nowrap; pointer-events: none; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 4px; }
+  .lg { display: flex; align-items: center; gap: 7px; font-size: 0.78rem; color: var(--text-secondary); }
+  .sw { width: 11px; height: 11px; border-radius: 3px; flex: none; }
+
+  /* format bars */
+  .fbar-row { display: grid; grid-template-columns: 116px 1fr 92px; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .fbar-name { font-size: 0.82rem; color: var(--text-secondary); }
+  .fbar-track { height: 20px; position: relative; }
+  .fbar-fill { height: 20px; border-radius: 0 4px 4px 0; background: var(--seq-400); }
+  .fbar-val { font-size: 0.82rem; font-variant-numeric: tabular-nums; color: var(--text-primary); text-align: right; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  th, td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--grid); }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--text-muted); font-weight: 500; font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  td { font-variant-numeric: tabular-nums; color: var(--text-primary); }
+  tbody tr:last-child td { border-bottom: none; font-weight: 600; }
+  .tname { display: flex; align-items: center; gap: 8px; }
+
+  details { margin-top: 4px; }
+  summary { cursor: pointer; color: var(--text-secondary); font-size: 0.8rem; padding: 6px 0; }
+  summary:hover { color: var(--text-primary); }
+  .prose { color: var(--text-secondary); font-size: 0.83rem; line-height: 1.65; }
+  .prose b { color: var(--text-primary); font-weight: 600; }
+  .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+  .foot { color: var(--text-muted); font-size: 0.74rem; line-height: 1.6; margin-top: 10px; }
+  code { font-size: 0.92em; background: var(--grid); padding: 1px 5px; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="viz-root">
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Mystic Oracle — unit economics</h1>
+      <p class="sub">What a reading costs to produce (nothing) against what it earns. Drag the assumptions to match
+      what you actually see once you have install data.</p>
+    </div>
+    <button class="theme-btn" id="themeBtn">Light mode</button>
+  </header>
+
+  <!-- HERO -->
+  <div class="card">
+    <div class="hero-row">
+      <div>
+        <div class="hero-label">Estimated net revenue per month</div>
+        <div class="hero-value" id="heroVal">$373</div>
+      </div>
+      <div class="hero-note" id="heroNote">at 1,000 daily active users · after Google Play's 15% cut</div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="card">
+    <h2>Per reading</h2>
+    <p class="card-sub">Every reading is produced on-device from static content, seeded randomness and local
+    astronomy — there is no server and no API call, so the marginal cost is exactly zero.</p>
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Cost to generate one reading</div>
+        <div class="kpi-value zero">$0.0000</div>
+        <div class="kpi-note">On-device. No server, no API.</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Earned per rewarded unlock</div>
+        <div class="kpi-value" id="kRew">$0.0101</div>
+        <div class="kpi-note">One completed rewarded video</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Earned per free reading</div>
+        <div class="kpi-value" id="kFree">$0.0027</div>
+        <div class="kpi-note">Banner + share of an interstitial</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">A subscriber is worth</div>
+        <div class="kpi-value" id="kMult">8.5×</div>
+        <div class="kpi-note">…an ad-supported user, per month</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="card">
+    <h2>Assumptions</h2>
+    <p class="card-sub">Defaults are mid-range industry benchmarks with a 78% fill rate and a 25% realism haircut applied.</p>
+    <div class="controls" id="controls"></div>
+  </div>
+
+  <div class="grid2">
+    <!-- MIX -->
+    <div class="card">
+      <h2>Where the money comes from</h2>
+      <p class="card-sub">Monthly net revenue by source.</p>
+      <div class="stack" id="stack"></div>
+      <div class="legend" id="legend"></div>
+      <details>
+        <summary>Table view</summary>
+        <table>
+          <thead><tr><th>Source</th><th>Per month</th><th>Share</th></tr></thead>
+          <tbody id="mixTable"></tbody>
+        </table>
+      </details>
+    </div>
+
+    <!-- FORMAT VALUE -->
+    <div class="card">
+      <h2>Revenue per 1,000 impressions</h2>
+      <p class="card-sub">Blended for your Tier-1 traffic mix, after fill rate and haircut. This is why rewarded
+      ads matter more than banners.</p>
+      <div id="fbars"></div>
+      <p class="foot" id="fbarNote"></p>
+    </div>
+  </div>
+
+  <!-- COSTS -->
+  <div class="card">
+    <h2>What it costs to run</h2>
+    <div class="grid2">
+      <div class="prose">
+        <p style="margin-top:0"><b>Today: essentially nothing.</b> Play Console is <b>$25 once</b>. The domain is
+        about <b>$12/year</b>. Cloudflare Pages, AdMob and RevenueCat are all <b>$0</b> at your scale —
+        RevenueCat only starts charging (1%) above $2,500 monthly tracked revenue.</p>
+        <p>That puts break-even at roughly <b>3 daily users</b>. Everything past that is margin.</p>
+      </div>
+      <div class="prose">
+        <p style="margin-top:0"><b>If you ever add AI-written readings</b>, the sums still work — but only if you
+        pre-generate. Twelve signs × three periods, generated once daily on a cheap model and served to everyone,
+        costs about <b>$0.28/month total</b> regardless of how many users you have.</p>
+        <p>Generating live, per user, per reading is where it gets tight: fine on a budget model
+        (~$0.0003, covered 36× by one rewarded view), <b>loss-making on a mid-tier model for free readings</b>
+        (~$0.006 against $0.0027 earned).</p>
+      </div>
+    </div>
+    <details>
+      <summary>Per-reading AI cost comparison</summary>
+      <table>
+        <thead><tr><th>Model tier</th><th>Per personalised reading</th><th>Covered by a rewarded view</th><th>Covered by a free reading</th></tr></thead>
+        <tbody id="aiTable"></tbody>
+      </table>
+    </details>
+  </div>
+
+  <p class="foot">
+    eCPM ranges from Playwire's AdMob benchmarks (Tier 1: banner $0.50–1.50, interstitial $5–8, rewarded $15–30;
+    global average: banner $0.20–0.80, interstitial $2.50–5.00, rewarded $8–18) — midpoints used, blended by your
+    Tier-1 share, then multiplied by a 78% fill rate and a 25% haircut, per their guidance to plan for 70–80% of
+    calculator estimates. Google Play takes 15% on the first $1M/year. AI pricing from published Gemini API rates
+    (Aug 2026), assuming ~400 input and ~600 output tokens per reading. These are planning estimates, not forecasts —
+    real eCPM swings with season, geography and fill.
+  </p>
+
+</div>
+</div>
+
+<script>
+const ECPM = {
+  tier1:  { banner: 1.00, inter: 6.50, rewarded: 22.50 },
+  global: { banner: 0.50, inter: 3.75, rewarded: 13.00 }
+};
+const PLAY_CUT = 0.15, FILL = 0.78, HAIRCUT = 0.75, DAYS = 30.4;
+
+const S = {
+  dau: 1000, t1: 45, readings: 3, rewardedViews: 6, bannerImps: 4,
+  cadence: 3, conv: 20, monthly: 399, yearly: 2499, yearlyShare: 40
+};
+
+const CTRLS = [
+  { k:'dau',           label:'Daily active users',            min:50,  max:50000, step:50,  fmt:v=>v.toLocaleString() },
+  { k:'t1',            label:'Traffic from Tier-1 countries', min:0,   max:100,   step:5,   fmt:v=>v+'%' },
+  { k:'readings',      label:'Readings per user per day',     min:1,   max:10,    step:1,   fmt:v=>v },
+  { k:'rewardedViews', label:'Rewarded views per user/day',   min:0,   max:30,    step:1,   fmt:v=>(v/10).toFixed(1) },
+  { k:'bannerImps',    label:'Banner impressions per session',min:0,   max:12,    step:1,   fmt:v=>v },
+  { k:'cadence',       label:'Readings per interstitial',     min:1,   max:10,    step:1,   fmt:v=>'1 in '+v },
+  { k:'conv',          label:'Subscribe conversion',          min:0,   max:150,   step:1,   fmt:v=>(v/10).toFixed(1)+'%' },
+  { k:'monthly',       label:'Monthly price',                 min:99,  max:999,   step:50,  fmt:v=>'$'+(v/100).toFixed(2) },
+  { k:'yearly',        label:'Yearly price',                  min:999, max:5999,  step:100, fmt:v=>'$'+(v/100).toFixed(2) },
+  { k:'yearlyShare',   label:'Subscribers choosing yearly',   min:0,   max:100,   step:5,   fmt:v=>v+'%' }
+];
+
+const blend = (t1, key) => ECPM.tier1[key]*t1 + ECPM.global[key]*(1-t1);
+const money = n => n >= 1000 ? '$' + Math.round(n).toLocaleString()
+                 : n >= 10   ? '$' + n.toFixed(0)
+                 : n >= 1    ? '$' + n.toFixed(2)
+                             : '$' + n.toFixed(4);
+
+function model() {
+  const t1 = S.t1/100, conv = S.conv/1000, yShare = S.yearlyShare/100;
+  const eff = FILL * HAIRCUT;
+  const b = blend(t1,'banner'), i = blend(t1,'inter'), r = blend(t1,'rewarded');
+
+  const perBanner = b/1000*eff, perInter = i/1000*eff, perRewarded = r/1000*eff;
+  const rv = S.rewardedViews/10;
+
+  const bannerDay = S.bannerImps * perBanner;
+  const interDay  = (S.readings / S.cadence) * perInter;
+  const rewDay    = rv * perRewarded;
+  const arpdau    = bannerDay + interDay + rewDay;
+
+  const subs = S.dau * conv, adUsers = S.dau - subs;
+  const price = (S.monthly/100)*(1-yShare) + (S.yearly/100/12)*yShare;
+  const subValue = price * (1 - PLAY_CUT);
+
+  const mix = {
+    banner: adUsers * bannerDay * DAYS,
+    inter:  adUsers * interDay  * DAYS,
+    rew:    adUsers * rewDay    * DAYS,
+    subs:   subs * subValue
+  };
+  let total = mix.banner + mix.inter + mix.rew + mix.subs;
+  if (total > 2500) total -= mix.subs * 0.01;
+
+  return { arpdau, perBanner, perInter, perRewarded, mix, total, subValue,
+    adUserMonthly: arpdau*DAYS,
+    perFreeReading: (S.bannerImps*perBanner) + perInter/S.cadence };
+}
+
+const SERIES = [
+  { key:'rew',    name:'Rewarded ads',   cls:'seg-1', css:'--series-1' },
+  { key:'inter',  name:'Interstitials',  cls:'seg-2', css:'--series-2' },
+  { key:'subs',   name:'Subscriptions',  cls:'seg-3', css:'--series-3' },
+  { key:'banner', name:'Banners',        cls:'seg-4', css:'--series-4' }
+];
+
+function render() {
+  const m = model();
+
+  document.getElementById('heroVal').textContent = money(m.total);
+  document.getElementById('heroNote').textContent =
+    'at ' + S.dau.toLocaleString() + ' daily active users · after Google Play’s 15% cut';
+
+  document.getElementById('kRew').textContent  = money(m.perRewarded);
+  document.getElementById('kFree').textContent = money(m.perFreeReading);
+  document.getElementById('kMult').textContent =
+    m.adUserMonthly > 0 ? (m.subValue/m.adUserMonthly).toFixed(1)+'×' : '—';
+
+  // stacked bar
+  const sum = SERIES.reduce((a,s)=>a+m.mix[s.key],0) || 1;
+  const stack = document.getElementById('stack');
+  stack.innerHTML = SERIES.map(s => {
+    const pct = m.mix[s.key]/sum*100;
+    // only label inside when the segment is genuinely wide enough for the text
+    const label = pct >= 13 ? '<span class="seg-label" style="color:'+labelInk(s.css)+'">'+Math.round(pct)+'%</span>' : '';
+    return '<div class="seg '+s.cls+'" style="width:'+pct+'%" title="'+s.name+': '+money(m.mix[s.key])+' / month ('+pct.toFixed(1)+'%)">'+label+'</div>';
+  }).join('');
+
+  document.getElementById('legend').innerHTML = SERIES.map(s =>
+    '<span class="lg"><span class="sw" style="background:var('+s.css+')"></span>'+s.name+'</span>').join('');
+
+  document.getElementById('mixTable').innerHTML = SERIES.map(s =>
+    '<tr><td><span class="tname"><span class="sw" style="background:var('+s.css+')"></span>'+s.name+'</span></td>'+
+    '<td>'+money(m.mix[s.key])+'</td><td>'+(m.mix[s.key]/sum*100).toFixed(1)+'%</td></tr>').join('')
+    + '<tr><td>Total</td><td>'+money(m.total)+'</td><td>100%</td></tr>';
+
+  // format bars — single series, magnitude, sequential hue
+  const fmts = [
+    { n:'Rewarded video', v:m.perRewarded*1000 },
+    { n:'Interstitial',   v:m.perInter*1000 },
+    { n:'Banner',         v:m.perBanner*1000 }
+  ];
+  const max = Math.max.apply(null, fmts.map(f=>f.v)) || 1;
+  document.getElementById('fbars').innerHTML = fmts.map(f =>
+    '<div class="fbar-row"><div class="fbar-name">'+f.n+'</div>'+
+    '<div class="fbar-track"><div class="fbar-fill" style="width:'+(f.v/max*100)+'%"></div></div>'+
+    '<div class="fbar-val">$'+f.v.toFixed(2)+'</div></div>').join('');
+  document.getElementById('fbarNote').textContent =
+    'A rewarded view is worth ' + (m.perRewarded/m.perBanner).toFixed(0) +
+    '× a banner impression here, which is why one more rewarded surface beats ten more banners.';
+
+  // AI table
+  const AI = [['Budget (Flash-Lite class)',0.10,0.40],['Mid (Flash-Lite newer)',0.25,1.50],['Mid-high (Flash class)',1.50,9.00]];
+  document.getElementById('aiTable').innerHTML = AI.map(([n,pin,pout]) => {
+    const c = 400*pin/1e6 + 600*pout/1e6;
+    const rc = m.perRewarded/c, fc = m.perFreeReading/c;
+    return '<tr><td>'+n+'</td><td>$'+c.toFixed(4)+'</td><td>'+rc.toFixed(1)+'×</td><td>'+
+      (fc>=1 ? fc.toFixed(1)+'×' : '<span style="color:var(--series-2)">'+fc.toFixed(1)+'× — loses money</span>')+'</td></tr>';
+  }).join('');
+}
+
+// A label inside a coloured fill picks white or ink by whichever actually has
+// more contrast against that fill (proper sRGB relative luminance, not a guess).
+function labelInk(cssVar) {
+  const hex = getComputedStyle(document.querySelector('.viz-root')).getPropertyValue(cssVar).trim();
+  const m = hex.match(/^#?([0-9a-f]{6})$/i);
+  if (!m) return '#0b0b0b';
+  const n = parseInt(m[1], 16);
+  const lin = c => { c /= 255; return c <= 0.03928 ? c/12.92 : Math.pow((c+0.055)/1.055, 2.4); };
+  const L = 0.2126*lin(n>>16&255) + 0.7152*lin(n>>8&255) + 0.0722*lin(n&255);
+  const vsWhite = 1.05 / (L + 0.05);
+  const vsInk   = (L + 0.05) / 0.05;
+  return vsInk >= vsWhite ? '#0b0b0b' : '#ffffff';
+}
+
+// build controls
+document.getElementById('controls').innerHTML = CTRLS.map(c =>
+  '<div><div class="ctrl-label"><span>'+c.label+'</span><span class="ctrl-val" id="v_'+c.k+'"></span></div>'+
+  '<input type="range" id="c_'+c.k+'" min="'+c.min+'" max="'+c.max+'" step="'+c.step+'" value="'+S[c.k]+'"></div>').join('');
+
+CTRLS.forEach(c => {
+  const input = document.getElementById('c_'+c.k), out = document.getElementById('v_'+c.k);
+  const sync = () => { out.textContent = c.fmt(S[c.k]); };
+  input.addEventListener('input', () => { S[c.k] = +input.value; sync(); render(); });
+  sync();
+});
+
+const btn = document.getElementById('themeBtn');
+btn.addEventListener('click', () => {
+  const dark = document.documentElement.getAttribute('data-theme') !== 'light';
+  document.documentElement.setAttribute('data-theme', dark ? 'light' : 'dark');
+  btn.textContent = dark ? 'Dark mode' : 'Light mode';
+  render();
+});
+
+render();
+</script>
+</body>
+</html>

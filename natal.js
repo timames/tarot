@@ -376,6 +376,7 @@ const AstroEngine = (function () {
     aspects.sort((x, y2) => x.exact - y2.exact);
 
     let html = `<div class="chart-wheel-wrap">${drawWheel(c)}</div>`;
+    html += '<div id="ai-voice"></div>';
 
     html += '<div class="planet-table">';
     entries.forEach(([name, lonP]) => {
@@ -443,6 +444,29 @@ const AstroEngine = (function () {
 
     root.querySelector('#natal-result').innerHTML = html;
     root.querySelector('#natal-result').scrollIntoView({ behavior: 'smooth' });
+
+    // A written portrait of the chart. This module is Plus-only, so every
+    // viewer is already entitled. Silently absent if AI is off or unreachable.
+    const mount = root.querySelector('#ai-voice');
+    if (mount && MysticApp.ai && MysticApp.ai.enabled()) {
+      mount.innerHTML =
+        '<div class="ai-voice is-loading"><div class="ai-voice-head">Reading your chart…</div>' +
+        '<div class="ai-skeleton"><span></span><span></span><span></span></div></div>';
+      MysticApp.ai.reading('natal', {
+        placements: entries.map(([name, lonP]) => ({ body: name, sign: SIGN_NAMES[signOf(lonP)] })),
+        aspects: aspects.slice(0, 8).map(x => ({ a: x.a, b: x.b, type: x.aspect.name })),
+        dominant: dominant
+      }).then(text => {
+        if (!text) { mount.innerHTML = ''; return; }
+        mount.innerHTML =
+          '<div class="ai-voice"><div class="ai-voice-head">Your Chart, In Words' +
+          '<span class="ai-tag" title="Written for this chart">✦ for your chart</span></div>' +
+          '<div class="ai-voice-body">' +
+          String(text).split(/\n+/).map(s => s.trim()).filter(Boolean)
+            .map(s => '<p>' + MysticApp.esc(s) + '</p>').join('') +
+          '</div></div>';
+      });
+    }
   }
 
   function elementMeaning(el) {

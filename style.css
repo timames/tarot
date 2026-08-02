@@ -1227,3 +1227,696 @@ h1, h2, h3,
 }
 
 .ouija-board { aspect-ratio: 10 / 8; }
+
+/* ============================================================
+   Mystic Oracle — visual + motion polish pass
+   Append to the END of style.css (it overrides earlier rules
+   by source order, so nothing above needs editing).
+   CSS-only: no JS changes required.
+   ============================================================ */
+
+/* --- Depth behind the starfield: two soft nebula blooms ------ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10% -20%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background:
+    radial-gradient(38% 30% at 18% 22%, rgba(88, 42, 150, 0.55), transparent 70%),
+    radial-gradient(34% 26% at 84% 62%, rgba(20, 84, 96, 0.40), transparent 70%);
+  filter: blur(50px);
+}
+
+/* --- Starfield: warm highlights + very slow parallax drift --- */
+.star {
+  animation:
+    twinkle var(--dur) ease-in-out infinite alternate,
+    starDrift 46s linear infinite alternate;
+}
+
+.star:nth-of-type(3n) {
+  background: #fff5e0;
+  box-shadow: 0 0 5px rgba(255, 240, 200, 0.85);
+}
+
+.star:nth-of-type(3n + 1) { animation-duration: var(--dur), 62s; }
+
+@keyframes starDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(0, -40px, 0); }
+}
+
+/* --- Header: ornamented gold rule under the subtitle -------- */
+header::after {
+  content: '';
+  display: block;
+  width: 132px;
+  height: 9px;
+  margin: 0.85rem auto 0;
+  background:
+    linear-gradient(90deg, transparent, rgba(212, 160, 74, 0.6) 42%, transparent 43%) no-repeat left center / 40px 1px,
+    linear-gradient(90deg, transparent 57%, rgba(212, 160, 74, 0.6) 58%, transparent) no-repeat right center / 40px 1px,
+    radial-gradient(circle, #d4a04a 0 2px, transparent 2px) no-repeat center center / 9px 9px;
+}
+
+/* --- Shared motion primitives -------------------------------- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes ringSpin {
+  from { transform: rotate(0); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes ringSpinRev {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(0); }
+}
+
+@keyframes goldSweep {
+  0%   { transform: translateX(-140%) skewX(-18deg); opacity: 0; }
+  35%  { opacity: 0.85; }
+  100% { transform: translateX(240%) skewX(-18deg); opacity: 0; }
+}
+
+/* --- Home grid: staggered entrance, warmer hover, real press -- */
+.home-tile {
+  animation: fadeUp 0.5s ease both;
+  transition: transform 0.22s ease, border-color 0.22s ease,
+              background 0.22s ease, box-shadow 0.22s ease;
+}
+
+.home-tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  background: radial-gradient(60% 50% at 50% 0%, rgba(212, 160, 74, 0.16), transparent 70%);
+}
+
+.home-tile:hover::after { opacity: 1; }
+.home-tile:hover { box-shadow: 0 10px 30px rgba(212, 160, 74, 0.16); }
+.home-tile:active { transform: translateY(-1px) scale(0.985); }
+
+.home-tile:nth-child(1)  { animation-delay: 0.00s; }
+.home-tile:nth-child(2)  { animation-delay: 0.04s; }
+.home-tile:nth-child(3)  { animation-delay: 0.08s; }
+.home-tile:nth-child(4)  { animation-delay: 0.12s; }
+.home-tile:nth-child(5)  { animation-delay: 0.16s; }
+.home-tile:nth-child(6)  { animation-delay: 0.20s; }
+.home-tile:nth-child(7)  { animation-delay: 0.24s; }
+.home-tile:nth-child(8)  { animation-delay: 0.28s; }
+.home-tile:nth-child(9)  { animation-delay: 0.32s; }
+.home-tile:nth-child(10) { animation-delay: 0.36s; }
+
+/* --- Buttons: press feedback -------------------------------- */
+.btn-primary:active,
+.btn-new-reading:active,
+.btn-ghost:active { transform: scale(0.98); }
+.stepper-btn:active,
+.btn-back:active { transform: scale(0.93); }
+
+/* --- Tarot: spread picker reads as three cards in a list ----- */
+.spread-options {
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.spread-btn {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  animation: fadeUp 0.45s ease both;
+}
+
+.spread-btn:nth-child(2) { animation-delay: 0.06s; }
+.spread-btn:nth-child(3) { animation-delay: 0.12s; }
+.spread-btn:active { transform: translateY(0) scale(0.99); }
+
+.spread-icon {
+  flex: none;
+  width: 44px;
+  height: 60px;
+  margin: 0;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  line-height: 1.15;
+  border: 1px solid rgba(212, 160, 74, 0.45);
+  border-radius: 7px;
+  background: linear-gradient(150deg, #241045, #150a2c);
+  box-shadow: inset 0 0 18px rgba(90, 40, 150, 0.6);
+  overflow: hidden;
+}
+
+.spread-name { margin-bottom: 0.25rem; }
+.spread-desc { line-height: 1.4; }
+
+/* --- Tarot: cards deal in on an arc -------------------------- */
+@keyframes cardAppear {
+  0%   { opacity: 0; transform: translateY(-140px) rotate(-14deg) scale(0.82); }
+  60%  { opacity: 1; }
+  100% { opacity: 1; transform: translateY(0) rotate(0) scale(1); }
+}
+
+.card-slot { animation-duration: 0.7s; animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+.card-slot:active .card:not(.flipped) { transform: translateY(-4px) scale(0.99); }
+
+/* Slow, weightier flip */
+.card { transition: transform 0.85s cubic-bezier(0.4, 0.1, 0.25, 1); }
+
+/* Living sigil on the card back */
+.card-back-pattern::before { animation: ringSpinRev 26s linear infinite; }
+
+/* Specular sweep across the face the moment a card turns over */
+.card-front { position: absolute; }
+
+.card-front::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 34%;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+}
+
+.card.flipped .card-front::after { animation: goldSweep 0.9s ease-out 0.5s both; }
+
+/* --- Interpretation: gold accent + cascade in ---------------- */
+.interpretation .interp-card {
+  border-left: 3px solid rgba(212, 160, 74, 0.55);
+  animation: fadeUp 0.5s ease both;
+}
+
+.interpretation .interp-card:nth-child(2) { animation-delay: 0.08s; }
+.interpretation .interp-card:nth-child(3) { animation-delay: 0.16s; }
+.interpretation .interp-card:nth-child(4) { animation-delay: 0.24s; }
+.interpretation .interp-card:nth-child(5) { animation-delay: 0.32s; }
+
+.interp-summary {
+  background: linear-gradient(140deg, rgba(212, 160, 74, 0.13), rgba(212, 160, 74, 0.04));
+  animation: fadeUp 0.5s ease 0.36s both;
+}
+
+.interp-summary::before {
+  content: '\2726';
+  display: block;
+  color: #d4a04a;
+  opacity: 0.7;
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+/* --- Horoscope: constellation rings around the sign glyph ---- */
+.zodiac-tile { animation: fadeUp 0.45s ease both; }
+.zodiac-tile:nth-child(3n + 2) { animation-delay: 0.05s; }
+.zodiac-tile:nth-child(3n)     { animation-delay: 0.10s; }
+.zodiac-tile:active { transform: scale(0.97); }
+
+.sign-header-glyph {
+  position: relative;
+  width: 124px;
+  height: 124px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.25rem;
+  filter: drop-shadow(0 0 20px rgba(212, 160, 74, 0.45));
+}
+
+.sign-header-glyph::before,
+.sign-header-glyph::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+}
+
+.sign-header-glyph::before {
+  inset: 0;
+  border: 1px solid rgba(212, 160, 74, 0.22);
+  animation: ringSpin 44s linear infinite;
+}
+
+.sign-header-glyph::after {
+  inset: 11px;
+  border: 1px dashed rgba(212, 160, 74, 0.16);
+  animation: ringSpinRev 60s linear infinite;
+}
+
+.sign-facts span {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid rgba(212, 160, 74, 0.18);
+  border-radius: 11px;
+  background: rgba(212, 160, 74, 0.07);
+}
+
+.sign-facts { gap: 0.5rem; }
+.sign-facts b { margin-right: 0; font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; color: #9a8bb0; }
+
+.lucky-item { animation: fadeUp 0.45s ease both; }
+.lucky-row .lucky-item:nth-child(2) { animation-delay: 0.08s; }
+.lucky-row .lucky-item:nth-child(3) { animation-delay: 0.16s; }
+
+/* --- Numerology: orbiting ring on each number badge --------- */
+.num-badge { position: relative; }
+
+.num-badge::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 160, 74, 0.18);
+  animation: ringSpin 30s linear infinite;
+}
+
+#num-result .interp-card { animation: fadeUp 0.5s ease both; }
+#num-result .interp-card:nth-child(2) { animation-delay: 0.07s; }
+#num-result .interp-card:nth-child(3) { animation-delay: 0.14s; }
+#num-result .interp-card:nth-child(4) { animation-delay: 0.21s; }
+#num-result .interp-card:nth-child(5) { animation-delay: 0.28s; }
+#num-result .interp-card:nth-child(6) { animation-delay: 0.35s; }
+
+/* --- Lucky numbers: orbs land with weight, then catch light -- */
+@keyframes orbAppear {
+  0%   { opacity: 0; transform: translateY(-46px) scale(0.5); }
+  55%  { opacity: 1; transform: translateY(6px) scale(1.06); }
+  75%  { transform: translateY(-3px) scale(0.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.lucky-orb {
+  position: relative;
+  overflow: hidden;
+  animation-duration: 0.72s;
+  animation-timing-function: cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+
+.lucky-orb::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 44%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  animation: goldSweep 1.1s ease-out 0.55s both;
+}
+
+/* --- Tap hint: breathes instead of blinking ----------------- */
+.tap-hint { animation: hintPulse 2.6s ease-in-out infinite; }
+
+/* --- Reduced motion: keep the earlier guard authoritative ---- */
+@media (prefers-reduced-motion: reduce) {
+  body::before { filter: blur(60px); }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== Multi-day spreads (7 / 22 / 78) ===== */
+
+.md-seal { text-align: center; max-width: 480px; margin: 0 auto; }
+.md-back-btn { margin-top: 1rem; }
+.md-spread { max-width: 740px; margin: 0 auto; }
+.md-header { text-align: center; margin-bottom: 1rem; }
+.md-header .md-back-btn { margin-bottom: 0.5rem; }
+.md-divider { margin-top: 2rem; }
+
+.spread-icon.md-icon {
+  font-family: 'Cinzel', 'Segoe UI', Georgia, serif;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #d4a04a;
+  letter-spacing: 0.05em;
+}
+
+.hs-progress { text-align: center; margin-bottom: 1rem; }
+.hs-dots { display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+.hs-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 1px solid rgba(212, 160, 74, 0.5);
+  background: transparent; transition: background 0.3s ease;
+}
+.hs-dot.filled { background: #d4a04a; box-shadow: 0 0 8px rgba(212, 160, 74, 0.4); }
+.hs-status { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: #9a8bb0; }
+
+.md-bar {
+  max-width: 280px; height: 6px; margin: 0 auto 0.4rem;
+  background: rgba(255, 255, 255, 0.07); border-radius: 3px; overflow: hidden;
+}
+.md-bar-fill {
+  height: 100%; background: linear-gradient(90deg, #d4a04a, #e3b96a);
+  border-radius: 3px; transition: width 0.4s ease;
+}
+
+.md-grid { max-width: 700px; margin: 0 auto; }
+
+.md-group-label {
+  font-family: 'Cinzel', 'Segoe UI', Georgia, serif;
+  font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase;
+  color: rgba(212, 160, 74, 0.7); text-align: center; margin: 1rem 0 0.5rem;
+  width: 100%;
+}
+.md-group-label:first-child { margin-top: 0; }
+
+.md-group-cards {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+}
+
+.md-card-slot { position: relative; cursor: pointer; }
+.md-card-slot.locked { cursor: default; }
+.md-card-slot.locked .card { opacity: 0.35; }
+
+.md-card-slot.turnable .card-back {
+  box-shadow: 0 0 20px rgba(212, 160, 74, 0.3), inset 0 0 40px rgba(45, 21, 96, 0.5);
+  animation: hintPulse 2.6s ease-in-out infinite;
+}
+
+.md-day-badge {
+  position: absolute; top: -4px; right: -4px; width: 18px; height: 18px;
+  border-radius: 50%; background: rgba(26, 10, 46, 0.9);
+  border: 1px solid rgba(212, 160, 74, 0.4); color: #9a8bb0;
+  font-size: 0.5rem; display: flex; align-items: center; justify-content: center; z-index: 2;
+}
+.md-card-slot.turnable .md-day-badge,
+.md-card-slot:not(.locked) .md-day-badge { border-color: #d4a04a; color: #d4a04a; }
+
+/* Card sizes per spread */
+.md-grid-7  .md-card { width: 80px; height: 120px; }
+.md-grid-22 .md-card { width: 56px; height: 84px; }
+.md-grid-78 .md-card { width: 44px; height: 66px; }
+
+.md-grid-7  .md-card .card-illustration { font-size: 2rem; }
+.md-grid-7  .md-card .card-illustration svg { max-height: 60px; }
+.md-grid-7  .md-card .card-title { font-size: 0.58rem; }
+.md-grid-7  .md-card .card-numeral { font-size: 0.58rem; }
+.md-grid-7  .md-card .card-suit { font-size: 0.5rem; }
+.md-grid-7  .md-card .card-back-symbol { font-size: 1.8rem; }
+
+.md-grid-22 .md-card .card-illustration { font-size: 1.4rem; }
+.md-grid-22 .md-card .card-illustration svg { max-height: 40px; }
+.md-grid-22 .md-card .card-title { font-size: 0.46rem; }
+.md-grid-22 .md-card .card-numeral { font-size: 0.46rem; }
+.md-grid-22 .md-card .card-suit { font-size: 0.4rem; }
+.md-grid-22 .md-card .card-back-symbol { font-size: 1.2rem; }
+.md-grid-22 .md-card .card-front { padding: 0.35rem; }
+
+.md-grid-78 .md-card .card-illustration { font-size: 1.1rem; }
+.md-grid-78 .md-card .card-illustration svg { max-height: 28px; }
+.md-grid-78 .md-card .card-title { font-size: 0; }
+.md-grid-78 .md-card .card-numeral { font-size: 0.42rem; }
+.md-grid-78 .md-card .card-suit { font-size: 0; }
+.md-grid-78 .md-card .card-front { padding: 0.2rem; }
+.md-grid-78 .md-card .card-back-symbol { font-size: 0.9rem; }
+.md-grid-78 .card-face { border-radius: 6px; }
+
+.hs-waiting {
+  text-align: center; background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 160, 74, 0.15); border-radius: 14px;
+  padding: 1.5rem; max-width: 420px; margin: 0 auto; animation: fadeIn 0.4s ease;
+}
+.hs-waiting-title {
+  font-family: 'Cinzel', 'Segoe UI', Georgia, serif;
+  font-size: 1.1rem; color: #d4a04a; letter-spacing: 0.12em; margin-bottom: 0.5rem;
+}
+.hs-waiting-pos { font-size: 0.85rem; color: #c4b8a0; line-height: 1.6; }
+
+@media (max-width: 430px) {
+  .md-grid-7  .md-card { width: 64px; height: 96px; }
+  .md-grid-22 .md-card { width: 46px; height: 69px; }
+  .md-grid-78 .md-card { width: 36px; height: 54px; }
+  .md-grid-7  .md-card .card-illustration { font-size: 1.5rem; }
+  .md-grid-7  .md-card .card-illustration svg { max-height: 46px; }
+  .md-grid-7  .md-card .card-title { font-size: 0.48rem; }
+  .md-grid-22 .md-card .card-illustration { font-size: 1.1rem; }
+  .md-grid-22 .md-card .card-illustration svg { max-height: 30px; }
+  .md-grid-22 .md-card .card-title { font-size: 0.4rem; }
+  .md-grid-78 .md-card .card-illustration { font-size: 0.85rem; }
+  .md-grid-78 .md-card .card-illustration svg { max-height: 20px; }
+  .md-group-cards { gap: 4px; }
+  .md-day-badge { width: 14px; height: 14px; font-size: 0.4rem; top: -3px; right: -3px; }
+}
+
+/* ===== Monetization: badges, gates, subscribe, horoscope tabs ===== */
+
+/* Access badges on home tiles + tarot spread picker */
+.tile-badge { display: inline-flex; align-items: center; gap: 0.28rem; }
+.plus-badge, .ad-badge {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 0.24rem 0.5rem; border-radius: 20px; line-height: 1;
+}
+.plus-badge { background: linear-gradient(160deg, #e3b96a, #c08c2e); color: #221304; box-shadow: 0 2px 10px rgba(212,160,74,0.4); }
+.ad-badge { background: rgba(20,10,40,0.72); color: #e8d9b5; border: 1px solid rgba(212,160,74,0.4); }
+.plus-badge svg, .ad-badge svg { width: 12px; height: 12px; }
+
+.spread-btn { position: relative; }
+
+/* Gate screens (rewarded + plus) */
+.gate { max-width: 440px; margin: 0 auto; text-align: center; padding-top: 1rem; }
+.gate-icon { color: #d4a04a; margin: 0 auto 1rem; }
+.gate-icon svg { width: 60px; height: 60px; filter: drop-shadow(0 0 14px rgba(212,160,74,0.35)); }
+.gate h2 { font-weight: 400; letter-spacing: 0.1em; font-size: 1.5rem; margin-bottom: 0.8rem; }
+.gate-text { color: #c4b8a0; line-height: 1.7; margin-bottom: 0.5rem; }
+.gate-text b { color: #d4a04a; }
+.gate-btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem; }
+.gate-btn svg { width: 20px; height: 20px; }
+.gate-or { color: #8f82a8; font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; margin: 0.4rem 0; }
+.gate-plus { background: rgba(212,160,74,0.08); border: 1px solid rgba(212,160,74,0.25); border-radius: 16px; padding: 1.3rem; margin-top: 0.8rem; }
+.gate-plus h3 { color: #d4a04a; letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+.gate-plus p { color: #c4b8a0; font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; }
+.gate-err { color: #e0917f; font-size: 0.85rem; margin: -0.6rem 0 0.6rem; }
+.gate-restore { margin-top: 0.4rem; }
+
+.link-btn { background: none; border: none; color: #ab9ec4; font-family: inherit; font-size: 0.85rem; letter-spacing: 0.04em; cursor: pointer; text-decoration: underline; padding: 0.5rem; }
+.link-btn:hover { color: #d4a04a; }
+.sub-preview { display: block; margin: 0.4rem auto 0; opacity: 0.6; }
+
+/* Home "Go Plus" CTA under the grid */
+.home-plus-cta {
+  grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  margin-top: 0.4rem; padding: 0.85rem 1rem; border-radius: 16px; cursor: pointer;
+  background: rgba(212,160,74,0.09); border: 1px solid rgba(212,160,74,0.3);
+  color: #e8d9b5; font-family: inherit; font-size: 0.9rem; letter-spacing: 0.03em;
+  transition: all 0.25s ease;
+}
+.home-plus-cta:hover { background: rgba(212,160,74,0.16); }
+.home-plus-cta svg { width: 20px; height: 20px; color: #d4a04a; flex-shrink: 0; }
+
+/* Subscribe screen */
+.subscribe { max-width: 460px; margin: 0 auto; text-align: center; }
+.sub-crown { color: #d4a04a; margin: 0.5rem auto 0.8rem; }
+.sub-crown svg { width: 56px; height: 56px; filter: drop-shadow(0 0 16px rgba(212,160,74,0.45)); }
+.subscribe h2 { font-weight: 400; letter-spacing: 0.12em; font-size: 1.6rem; margin-bottom: 1.2rem; }
+.sub-benefits { list-style: none; padding: 0; margin: 0 auto 1.4rem; max-width: 340px; text-align: left; }
+.sub-benefits li { color: #d8cbb4; line-height: 1.5; padding: 0.5rem 0 0.5rem 1.7rem; position: relative; border-bottom: 1px solid rgba(212,160,74,0.12); }
+.sub-benefits li::before { content: "\2726"; color: #d4a04a; position: absolute; left: 0.2rem; top: 0.5rem; }
+.plan-row { display: flex; gap: 0.8rem; justify-content: center; margin-bottom: 1rem; }
+.plan-card {
+  flex: 1 1 0; max-width: 180px; background: rgba(255,255,255,0.03); cursor: pointer;
+  border: 1.5px solid rgba(212,160,74,0.3); border-radius: 16px; padding: 1.1rem 0.8rem; position: relative;
+  color: #e8d9b5; font-family: inherit; transition: all 0.2s ease;
+}
+.plan-card.selected { border-color: #d4a04a; background: rgba(212,160,74,0.12); box-shadow: 0 4px 18px rgba(212,160,74,0.22); }
+.plan-tag { position: absolute; top: -0.7rem; left: 50%; transform: translateX(-50%); background: linear-gradient(160deg,#e3b96a,#c08c2e); color: #221304; font-size: 0.58rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 12px; white-space: nowrap; }
+.plan-name { font-size: 0.85rem; letter-spacing: 0.06em; text-transform: uppercase; color: #ab9ec4; margin-bottom: 0.35rem; }
+.plan-price { font-size: 1.3rem; font-weight: 600; color: #f0e4c8; }
+.plan-price span { font-size: 0.8rem; font-weight: 400; color: #9a8bb0; }
+.sub-cta { min-width: 220px; }
+.sub-terms { color: #8f82a8; font-size: 0.72rem; line-height: 1.5; max-width: 360px; margin: 0.6rem auto 0.4rem; }
+.sub-note { color: #c4b8a0; font-size: 0.9rem; line-height: 1.6; background: rgba(212,160,74,0.06); border: 1px solid rgba(212,160,74,0.2); border-radius: 12px; padding: 1rem; margin: 1rem 0; }
+.sub-thanks { color: #c4b8a0; line-height: 1.7; margin-bottom: 1rem; }
+
+/* Horoscope Daily / Monthly / Yearly tabs */
+.horo-tabs { display: flex; gap: 0.4rem; justify-content: center; margin: 0 auto 1.2rem; max-width: 440px; }
+.horo-tab {
+  flex: 1 1 0; padding: 0.6rem 0.5rem; cursor: pointer; font-family: inherit; font-size: 0.85rem;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(212,160,74,0.25); color: #c4b8a0;
+  border-radius: 12px; transition: all 0.2s ease; letter-spacing: 0.03em;
+}
+.horo-tab.active { background: linear-gradient(160deg,#e3b96a,#c08c2e); color: #221304; font-weight: 600; border-color: transparent; }
+.horo-lead { border-color: rgba(212,160,74,0.4); }
+.horo-locked { text-align: center; max-width: 400px; margin: 1rem auto; padding: 1.5rem; background: rgba(212,160,74,0.06); border: 1px solid rgba(212,160,74,0.22); border-radius: 16px; }
+.horo-locked-icon { color: #d4a04a; }
+.horo-locked-icon svg { width: 44px; height: 44px; filter: drop-shadow(0 0 12px rgba(212,160,74,0.35)); }
+.horo-locked h3 { color: #d4a04a; letter-spacing: 0.06em; margin: 0.5rem 0; }
+.horo-locked p { color: #c4b8a0; line-height: 1.6; font-size: 0.92rem; }
+.horo-locked-tag { font-size: 0.82rem; }
+.horo-locked-tag b { color: #d4a04a; }
+.horo-locked .btn-primary { display: inline-flex; align-items: center; gap: 0.5rem; }
+.horo-locked .btn-primary svg { width: 18px; height: 18px; }
+
+/* ===== Settings, onboarding, switches ===== */
+
+header { position: relative; }
+.btn-settings {
+  position: absolute; top: 0; right: 0; width: 40px; height: 40px;
+  background: none; border: none; cursor: pointer; color: #d4a04a; opacity: 0.75;
+  padding: 6px; transition: opacity .2s ease, transform .3s ease;
+}
+.btn-settings:hover { opacity: 1; transform: rotate(35deg); }
+.btn-settings svg { width: 100%; height: 100%; }
+
+/* Onboarding */
+.onboard { max-width: 420px; margin: 0 auto; text-align: center; }
+.onboard-mark { color: #d4a04a; margin: 0.5rem auto 1rem; }
+.onboard-mark svg { width: 54px; height: 54px; filter: drop-shadow(0 0 16px rgba(212,160,74,0.45)); }
+.onboard-lead { color: #c4b8a0; line-height: 1.7; margin-bottom: 1.6rem; }
+.ob-optional {
+  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #8f82a8; margin-left: 0.4rem;
+}
+.ob-sign {
+  color: #d4a04a; letter-spacing: 0.08em; font-size: 1.05rem;
+  margin: -0.4rem 0 0.4rem; text-align: center;
+}
+.ob-check {
+  display: flex; align-items: flex-start; gap: 0.6rem; text-align: left;
+  color: #c4b8a0; font-size: 0.85rem; line-height: 1.5; margin: 0.4rem 0 0.2rem;
+  cursor: pointer;
+}
+.ob-check input { margin-top: 0.15rem; accent-color: #d4a04a; width: 18px; height: 18px; flex-shrink: 0; }
+
+/* Settings */
+.settings { max-width: 460px; margin: 0 auto; }
+.set-heading {
+  color: #ab9ec4; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.14em;
+  font-weight: 600; margin: 1.6rem 0 0.6rem 0.2rem;
+}
+.set-card {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(212,160,74,0.18);
+  border-radius: 16px; padding: 0.4rem 1rem; margin-bottom: 0.4rem;
+}
+.set-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 0.85rem 0; border-bottom: 1px solid rgba(212,160,74,0.1);
+}
+.set-card > .set-row:last-child, .set-card > *:last-child { border-bottom: none; }
+.set-row-label { color: #e8d9b5; font-size: 0.92rem; }
+.set-row-note { color: #8f82a8; font-size: 0.76rem; line-height: 1.4; margin-top: 0.15rem; }
+.set-row-value { color: #9a8bb0; font-size: 0.9rem; }
+.set-time-row.dimmed { opacity: 0.4; pointer-events: none; }
+.set-time {
+  background: rgba(20,10,40,0.6); border: 1px solid rgba(212,160,74,0.3);
+  color: #f0e4c8; border-radius: 10px; padding: 0.45rem 0.6rem; font-family: inherit; font-size: 0.9rem;
+}
+.set-field { display: block; color: #ab9ec4; font-size: 0.8rem; padding: 0.7rem 0 0; }
+.set-field input {
+  display: block; width: 100%; box-sizing: border-box; margin-top: 0.35rem;
+  background: rgba(20,10,40,0.6); border: 1px solid rgba(212,160,74,0.3);
+  color: #f0e4c8; border-radius: 10px; padding: 0.6rem 0.7rem; font-family: inherit; font-size: 0.95rem;
+}
+.set-btn { display: block; width: 100%; margin: 0.8rem 0 0.2rem; }
+.set-saved { color: #d4a04a; font-size: 0.82rem; text-align: center; padding: 0.4rem 0 0.2rem; }
+.set-note { color: #8f82a8; font-size: 0.76rem; line-height: 1.5; padding: 0.2rem 0 0.8rem; }
+.set-link-row {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  background: none; border: none; border-bottom: 1px solid rgba(212,160,74,0.1);
+  color: #e8d9b5; font-family: inherit; font-size: 0.92rem; text-align: left;
+  padding: 0.9rem 0; cursor: pointer;
+}
+.set-link-row:hover { color: #d4a04a; }
+.set-chevron { color: #8f82a8; font-size: 1.2rem; }
+.set-terms-body { color: #a99cc0; font-size: 0.78rem; line-height: 1.6; padding: 0.2rem 0 0.9rem; }
+.set-danger { display: block; margin: 1.4rem auto 0.5rem; color: #b98a8a; }
+.set-danger.armed { color: #e0917f; text-decoration: none; font-weight: 600; }
+
+/* Plus card in settings */
+.set-plus { border-color: rgba(212,160,74,0.35); background: rgba(212,160,74,0.07); padding-bottom: 0.9rem; }
+.set-plus.is-plus { background: rgba(212,160,74,0.13); }
+.set-plus-head { display: flex; align-items: center; gap: 0.8rem; padding: 0.9rem 0 0.2rem; }
+.set-plus-icon { color: #d4a04a; flex-shrink: 0; }
+.set-plus-icon svg { width: 30px; height: 30px; display: block; }
+.set-plus-title { color: #f0e4c8; font-size: 1.02rem; letter-spacing: 0.04em; }
+.set-plus-state { color: #ab9ec4; font-size: 0.78rem; margin-top: 0.15rem; }
+.set-plus .link-btn { display: block; margin: 0.2rem auto 0; }
+.set-plus .btn-primary { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+.set-plus .btn-primary svg { width: 18px; height: 18px; }
+
+/* Switch */
+.switch {
+  position: relative; width: 46px; height: 26px; flex-shrink: 0; cursor: pointer;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(212,160,74,0.3);
+  border-radius: 20px; padding: 0; transition: all .25s ease;
+}
+.switch.on { background: linear-gradient(160deg,#e3b96a,#c08c2e); border-color: transparent; }
+.switch-knob {
+  position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%;
+  background: #cbbfd8; transition: all .25s ease;
+}
+.switch.on .switch-knob { left: 22px; background: #221304; }
+
+/* "your sign" chip on the horoscope header */
+.your-sign {
+  display: inline-block; vertical-align: middle; margin-left: 0.5rem;
+  font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #221304; background: linear-gradient(160deg,#e3b96a,#c08c2e);
+  padding: 0.2rem 0.5rem; border-radius: 12px;
+}
+.horo-setmine { display: block; margin: 0.2rem auto 1.5rem; }
+
+/* ===== AI-written readings ===== */
+
+.ai-voice {
+  background: linear-gradient(160deg, rgba(212,160,74,0.10), rgba(212,160,74,0.04));
+  border: 1px solid rgba(212,160,74,0.32);
+  border-radius: 16px; padding: 1.1rem 1.2rem; margin-bottom: 0.9rem;
+}
+.ai-voice-head {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+  color: #d4a04a; font-size: 0.95rem; letter-spacing: 0.06em; margin-bottom: 0.6rem;
+}
+.ai-voice-body { color: #e4d8c0; font-size: 0.94rem; line-height: 1.75; }
+.ai-voice-body p { margin: 0 0 0.7rem; }
+.ai-voice-body p:last-child { margin-bottom: 0; }
+
+.ai-tag {
+  font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em;
+  color: #221304; background: linear-gradient(160deg, #e3b96a, #c08c2e);
+  padding: 0.18rem 0.45rem; border-radius: 10px; white-space: nowrap;
+}
+.horo-lead h3 .ai-tag { margin-left: 0.5rem; vertical-align: middle; }
+
+/* loading shimmer */
+.ai-voice.is-loading .ai-voice-head { opacity: 0.85; }
+.ai-skeleton { display: flex; flex-direction: column; gap: 0.55rem; }
+.ai-skeleton span {
+  height: 11px; border-radius: 6px;
+  background: linear-gradient(90deg, rgba(212,160,74,0.10), rgba(212,160,74,0.28), rgba(212,160,74,0.10));
+  background-size: 200% 100%; animation: ai-shimmer 1.5s ease-in-out infinite;
+}
+.ai-skeleton span:nth-child(2) { width: 92%; animation-delay: 0.15s; }
+.ai-skeleton span:nth-child(3) { width: 68%; animation-delay: 0.3s; }
+@keyframes ai-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .ai-skeleton span { animation: none; } }
+
+/* rewarded offer on the free single card */
+.ai-offer {
+  text-align: center; background: rgba(212,160,74,0.07);
+  border: 1px solid rgba(212,160,74,0.25); border-radius: 16px;
+  padding: 1.2rem 1.1rem; margin-bottom: 0.9rem;
+}
+.ai-offer-icon { color: #d4a04a; }
+.ai-offer-icon svg { width: 32px; height: 32px; }
+.ai-offer-text { color: #c4b8a0; font-size: 0.9rem; line-height: 1.6; margin: 0.4rem auto 0.9rem; max-width: 32ch; }
+.ai-offer .btn-primary { margin: 0 auto; }

@@ -143,6 +143,7 @@
       const el = container.querySelector('#cz-result');
       el.innerHTML = html;
       el.scrollIntoView({ behavior: 'smooth' });
+      if (MysticApp.adReadingDone) MysticApp.adReadingDone();
     });
   }
 
