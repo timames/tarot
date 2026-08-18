@@ -6,9 +6,9 @@
 // the birth details the oracles share.
 
 (function () {
-  const APP_VERSION = '1.2';
+  const APP_VERSION = '1.3';
   const PACKAGE = 'net.ripdi.mystic_oracle';
-  const PRIVACY_URL = 'https://tarot.ripdi.net/privacy-policy.html';
+  const PRIVACY_URL = 'https://tarot.ripdi.net/privacy-policy';
   const MANAGE_URL = 'https://play.google.com/store/account/subscriptions?package=' + PACKAGE;
 
   function el(id) { return document.getElementById(id); }
