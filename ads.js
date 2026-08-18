@@ -13,7 +13,7 @@
 
 (function () {
   const ADS = {
-    TESTING: true,
+    TESTING: false,
     BANNER_ID: 'ca-app-pub-7770045632731047/6768627864',        // real banner
     INTERSTITIAL_ID: 'ca-app-pub-7770045632731047/1763713193',  // real interstitial
     REWARDED_ID: 'ca-app-pub-7770045632731047/8302181325',      // real rewarded

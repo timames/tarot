@@ -13,7 +13,7 @@
 // Deploy:  cd worker && npx wrangler deploy
 // Secrets: none — Workers AI is a binding, so there is no API key to leak.
 
-const MODEL = '@cf/meta/llama-3.1-8b-instruct';
+const MODEL = '@cf/meta/llama-3.1-8b-instruct-fp8';
 
 const SIGNS = [
   { name: 'Aries',       element: 'Fire',  ruler: 'Mars',              traits: 'bold, direct, impatient' },
@@ -113,9 +113,15 @@ function extractJson(text) {
   if (!text) return null;
   let s = String(text).trim().replace(/^```(?:json)?/i, '').replace(/```$/, '').trim();
   const start = s.indexOf('{');
+  if (start === -1) return null;
   const end = s.lastIndexOf('}');
-  if (start === -1 || end === -1 || end <= start) return null;
-  try { return JSON.parse(s.slice(start, end + 1)); } catch (e) { return null; }
+  if (end > start) {
+    try { return JSON.parse(s.slice(start, end + 1)); } catch (e) { /* fall through to repair */ }
+  }
+  // Some models stop right before the closing brace (or mid-string). Repair.
+  const body = s.slice(start).replace(/,\s*$/, '');
+  try { return JSON.parse(body + '}'); } catch (e) { /* try closing an open string too */ }
+  try { return JSON.parse(body + '"}'); } catch (e) { return null; }
 }
 
 function clean(v, max) {
@@ -167,12 +173,12 @@ async function generateSign(env, sign, period, keyLabel) {
       { role: 'system', content: GUARDRAILS },
       { role: 'user', content: user }
     ],
-    max_tokens: period === 'year' ? 640 : 460,
+    max_tokens: period === 'year' ? 1024 : 800,
     temperature: 0.85
   });
 
   const parsed = extractJson(out && out.response);
-  if (!parsed) return null;
+  if (!parsed) { console.error('unparseable tail for ' + sign.name + ': ...' + JSON.stringify(out).slice(-300)); return null; }
   const limit = period === 'day' ? 320 : 640;
   const result = {
     general: clean(parsed.general, limit),
@@ -188,7 +194,7 @@ async function buildPeriod(env, period, key) {
   const label = period === 'day' ? key : period === 'month' ? key : 'the year ' + key;
   const results = await Promise.all(SIGNS.map(async s => {
     try { return [s.name, await generateSign(env, s, period, label)]; }
-    catch (e) { return [s.name, null]; }
+    catch (e) { console.error('generateSign failed for ' + s.name + ': ' + (e && e.message || e)); return [s.name, null]; }
   }));
 
   const signs = {};

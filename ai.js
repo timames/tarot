@@ -14,7 +14,7 @@
 // ────────────────────────────────────────────────────────────────────────────
 
 (function () {
-  const ENDPOINT = '';            // TODO: paste your deployed worker URL
+  const ENDPOINT = 'https://mystic-oracle-ai.tames.workers.dev';
   const TIMEOUT_MS = 9000;
   const OPT_OUT_KEY = 'mystic-ai';
   const CACHE_PREFIX = 'mystic-ai-horo-';

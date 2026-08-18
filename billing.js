@@ -25,7 +25,7 @@
 
 (function () {
   const RC = {
-    ANDROID_API_KEY: 'goog_YOUR_REVENUECAT_PUBLIC_KEY', // TODO
+    ANDROID_API_KEY: 'goog_usVUJpmnYfHeVeLJaKLsXCHATys',
     IOS_API_KEY: 'appl_YOUR_REVENUECAT_PUBLIC_KEY',     // TODO
     ENTITLEMENT_ID: 'plus'
   };

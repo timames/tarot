@@ -12,7 +12,7 @@
 
   // Cache for the pre-generated horoscopes.
   "kv_namespaces": [
-    { "binding": "ORACLE_KV", "id": "REPLACE_WITH_YOUR_KV_NAMESPACE_ID" }
+    { "binding": "ORACLE_KV", "id": "b573d07e132b4b75883c390594985e7b" }
   ],
 
   // 03:15 UTC daily. Writes today + tomorrow so every timezone has content ready;
