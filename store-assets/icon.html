@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 512px; height: 512px; overflow: hidden; }
+  .stage {
+    position: relative; width: 512px; height: 512px;
+    background: radial-gradient(circle at 50% 38%, #33186b 0%, #1a0a2e 62%, #110620 100%);
+    overflow: hidden;
+  }
+  .star { position: absolute; background: #fff; border-radius: 50%; }
+  .card {
+    position: absolute; left: 50%; top: 50%;
+    width: 236px; height: 356px;
+    transform: translate(-50%, -50%);
+    border-radius: 26px;
+    border: 8px solid #d4a04a;
+    background: linear-gradient(155deg, #2a1152, #1c0b38 60%, #24104a);
+    box-shadow: 0 0 70px rgba(212,160,74,0.35), 0 18px 50px rgba(0,0,0,0.55);
+  }
+  .inner {
+    position: absolute; inset: 14px;
+    border: 2px solid rgba(212,160,74,0.55); border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  /* radiant eye */
+  .eye {
+    position: relative; width: 150px; height: 150px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .eye svg { width: 150px; height: 150px; }
+  .corner { position: absolute; color: #d4a04a; font-size: 34px; font-family: Georgia, serif; opacity: 0.95; }
+  .tl { left: 26px; top: 18px; } .tr { right: 26px; top: 18px; }
+  .bl { left: 26px; bottom: 18px; } .br { right: 26px; bottom: 18px; }
+  .moon {
+    position: absolute; right: 58px; top: 52px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: radial-gradient(circle at 62% 38%, #f5ead6, #d8c49a 70%);
+    box-shadow: 0 0 26px rgba(245,234,214,0.55);
+  }
+  .moon::after {
+    content: ''; position: absolute; left: -11px; top: -5px;
+    width: 44px; height: 44px; border-radius: 50%; background: #1e0d38;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="moon"></div>
+  <div class="card">
+    <div class="inner">
+      <div class="eye">
+        <svg viewBox="0 0 100 100" fill="none" stroke="#d4a04a" stroke-width="3.2" stroke-linecap="round">
+          <!-- rays -->
+          <g stroke-width="3">
+            <line x1="50" y1="4"  x2="50" y2="17"/>
+            <line x1="50" y1="83" x2="50" y2="96"/>
+            <line x1="4"  y1="50" x2="17" y2="50"/>
+            <line x1="83" y1="50" x2="96" y2="50"/>
+            <line x1="17.5" y1="17.5" x2="26.7" y2="26.7"/>
+            <line x1="73.3" y1="73.3" x2="82.5" y2="82.5"/>
+            <line x1="82.5" y1="17.5" x2="73.3" y2="26.7"/>
+            <line x1="26.7" y1="73.3" x2="17.5" y2="82.5"/>
+          </g>
+          <!-- eye -->
+          <path d="M24,50 Q50,26 76,50 Q50,74 24,50 Z"/>
+          <circle cx="50" cy="50" r="10.5" fill="#d4a04a" stroke="none"/>
+          <circle cx="50" cy="50" r="4" fill="#1c0b38" stroke="none"/>
+        </svg>
+      </div>
+    </div>
+    <div class="corner tl">&#10022;</div>
+    <div class="corner tr">&#9790;</div>
+    <div class="corner bl">&#9790;</div>
+    <div class="corner br">&#10022;</div>
+  </div>
+</div>
+<script>
+  for (let i = 0; i < 26; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = 1.5 + Math.random() * 3;
+    s.style.width = s.style.height = sz + 'px';
+    s.style.left = Math.random() * 512 + 'px';
+    s.style.top = Math.random() * 512 + 'px';
+    s.style.opacity = 0.25 + Math.random() * 0.55;
+    document.querySelector('.stage').appendChild(s);
+  }
+</script>
+</body>
+</html>
