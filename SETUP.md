@@ -1,7 +1,7 @@
 # Mystic Oracle — AdMob & RevenueCat Setup Checklist
 
 A click-through guide for wiring live ads and subscriptions into this app
-(`net.ripdi.games.tarot`). Both services are free to create with your Google
+(`net.ripdi.mystic_oracle`). Both services are free to create with your Google
 account. **Do RevenueCat Step 2 first** — Google can take up to ~36 hours to
 activate the credentials, so start that clock, then do AdMob while you wait.
 
@@ -59,7 +59,7 @@ File references below are relative to the repo root (`C:\PERS\tarot`).
 
 ### Step 3 — Configure products in RevenueCat
 
-- [ ] Create a project; add the **Google Play app** with package **`net.ripdi.games.tarot`**.
+- [ ] Create a project; add the **Google Play app** with package **`net.ripdi.mystic_oracle`**.
 - [ ] **Entitlements → new** → identifier exactly **`plus`** (the code checks this string).
 - [ ] **Products** → add your two Play products (monthly, yearly).
 - [ ] Attach **both** products to the **`plus`** entitlement.
@@ -91,7 +91,7 @@ prices is almost always one of these not matching (or the 36-hour delay):
 
 | Thing | Value | Where it's set |
 | --- | --- | --- |
-| Android package | `net.ripdi.games.tarot` | Play Console + RevenueCat app |
+| Android package | `net.ripdi.mystic_oracle` | Play Console + RevenueCat app |
 | Entitlement | `plus` | RevenueCat → `billing.js` (`ENTITLEMENT_ID`) |
 | Offering | `default` | RevenueCat → read by `billing.js` |
 | Packages | **Monthly** + **Annual** | RevenueCat offering → read by `billing.js` |

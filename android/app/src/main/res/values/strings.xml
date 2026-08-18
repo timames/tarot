@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">Mystic Oracle</string>
     <string name="title_activity_main">Mystic Oracle</string>
-    <string name="package_name">net.ripdi.games.tarot</string>
-    <string name="custom_url_scheme">net.ripdi.games.tarot</string>
+    <string name="package_name">net.ripdi.mystic_oracle</string>
+    <string name="custom_url_scheme">net.ripdi.mystic_oracle</string>
 </resources>

@@ -10,7 +10,7 @@
 //        • Add your Google Play app; paste the Play service-account credentials.
 //        • Create an Entitlement with identifier "plus".
 //        • Create two subscription products in Play Console
-//          (e.g. net.ripdi.games.tarot.plus.monthly / .annual), import them
+//          (e.g. net.ripdi.mystic_oracle.plus.monthly / .annual), import them
 //          into RevenueCat, attach both to the "plus" entitlement.
 //        • Create an Offering (identifier "default") with a Monthly and an
 //          Annual package pointing at those products.

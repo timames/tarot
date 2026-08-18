@@ -107,7 +107,7 @@ First-run onboarding lives in `app.js` (`renderOnboarding()`), gated on `profile
 
 ## Mobile
 
-Capacitor v8 wraps the web app for Android and iOS. Config in `capacitor.config.json` (appId: `net.ripdi.games.tarot`). After web changes, `npm run cap:sync` copies `www/` to native projects. Keystore details tracked in memory files.
+Capacitor v8 wraps the web app for Android and iOS. Config in `capacitor.config.json` (appId: `net.ripdi.mystic_oracle`). After web changes, `npm run cap:sync` copies `www/` to native projects. Keystore details tracked in memory files.
 
 ## Data Files
 

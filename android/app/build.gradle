@@ -8,7 +8,7 @@ android {
     namespace = "net.ripdi.games.tarot"
     compileSdk = rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "net.ripdi.games.tarot"
+        applicationId "net.ripdi.mystic_oracle"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 3

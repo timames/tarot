@@ -24,7 +24,7 @@ Key code:
 Nothing below can be done from code alone; these are account actions. Do them first, then rebuild.
 
 ### A1. AdMob — three ad units
-1. At [admob.google.com](https://admob.google.com), create (or open) the app for `net.ripdi.games.tarot`.
+1. At [admob.google.com](https://admob.google.com), create (or open) the app for `net.ripdi.mystic_oracle`.
 2. Create **three** ad units: a **Banner**, an **Interstitial**, and a **Rewarded**.
 3. In `ads.js`, replace `BANNER_ID`, `INTERSTITIAL_ID`, `REWARDED_ID` with your real unit IDs and set `TESTING: false`.
 4. Replace the AdMob **app ID** (the `~` one) in two places:
@@ -121,7 +121,7 @@ Production → Create new release → upload the AAB → release notes → revie
 ## Apple App Store (when you're ready for iOS)
 
 The web layer is identical; only the native setup differs.
-1. `npm run cap:ios`, set your Team + bundle id `net.ripdi.games.tarot` in Xcode Signing.
+1. `npm run cap:ios`, set your Team + bundle id `net.ripdi.mystic_oracle` in Xcode Signing.
 2. **RevenueCat for iOS:** create the same subscription products in **App Store Connect**, import them into RevenueCat, attach to the `plus` entitlement, and use your `appl_…` public key (already referenced in `billing.js`).
 3. **AdMob for iOS:** replace `GADApplicationIdentifier` in `Info.plist`; add an **App Tracking Transparency** prompt (`NSUserTrackingUsageDescription` + request) since AdMob personalized ads require it.
 4. Set version/build, **Product → Archive → Distribute → App Store Connect**, then submit for review (typically 1–2 days).

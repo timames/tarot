@@ -6,8 +6,8 @@
 // the birth details the oracles share.
 
 (function () {
-  const APP_VERSION = '1.1';
-  const PACKAGE = 'net.ripdi.games.tarot';
+  const APP_VERSION = '1.2';
+  const PACKAGE = 'net.ripdi.mystic_oracle';
   const PRIVACY_URL = 'https://tarot.ripdi.net/privacy-policy.html';
   const MANAGE_URL = 'https://play.google.com/store/account/subscriptions?package=' + PACKAGE;
 
