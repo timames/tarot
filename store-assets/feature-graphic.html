@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  @font-face {
+    font-family: 'Cinzel';
+    src: url('https://tarot.ripdi.net/fonts/cinzel-latin.woff2') format('woff2');
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { width: 1024px; height: 500px; overflow: hidden; }
+  .stage {
+    position: relative;
+    width: 1024px; height: 500px;
+    background: radial-gradient(ellipse at 75% 30%, #2d1560 0%, #1a0a2e 55%, #12071f 100%);
+    overflow: hidden;
+  }
+  .star { position: absolute; background: #fff; border-radius: 50%; opacity: 0.8; }
+  .glow {
+    position: absolute; left: -140px; top: 60px;
+    width: 560px; height: 560px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,160,74,0.14) 0%, transparent 65%);
+  }
+  .text {
+    position: absolute; left: 70px; top: 150px; z-index: 5;
+  }
+  h1 {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 72px; font-weight: 400; letter-spacing: 0.06em;
+    color: #d4a04a;
+    text-shadow: 0 0 30px rgba(212,160,74,0.45);
+    white-space: nowrap;
+  }
+  .tagline {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 19px; letter-spacing: 0.14em;
+    color: #b9a8d0; margin-top: 18px;
+  }
+  .tagline b { color: #e8d8b0; font-weight: 400; }
+  .cards { position: absolute; right: 30px; top: 40px; width: 420px; height: 460px; z-index: 4; }
+  .fcard {
+    position: absolute; width: 168px; height: 284px; border-radius: 14px;
+    border: 3px solid #d4a04a;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.6), 0 0 24px rgba(212,160,74,0.25);
+    display: flex; align-items: center; justify-content: center;
+    transform-origin: 50% 120%;
+  }
+  .fcard .inner {
+    width: 80%; height: 84%; border: 1px solid rgba(255,255,255,0.28); border-radius: 9px;
+    display: flex; align-items: center; justify-content: center; position: relative;
+  }
+  .fcard .inner::before {
+    content: ''; position: absolute; width: 70%; height: 42%;
+    border: 1px solid rgba(255,255,255,0.18); border-radius: 50%;
+  }
+  .fcard .sym { font-size: 64px; opacity: 0.9; }
+  .c1 { left: 30px; top: 92px; transform: rotate(-14deg);
+        background: linear-gradient(145deg, #1e0a3c, #2d1560); }
+  .c1 .sym { color: #d4a04a; }
+  .c2 { left: 128px; top: 74px; transform: rotate(0deg); z-index: 2;
+        background: linear-gradient(135deg, #0b2a3c, #3c1560, #0b3c2a, #26105c); border-color: #9fe8d5; }
+  .c2 .sym { color: #9fe8d5; }
+  .c3 { left: 226px; top: 92px; transform: rotate(14deg);
+        background: linear-gradient(145deg, #131338, #2c2c66); border-color: #dfe6ff; }
+  .c3 .sym { color: #dfe6ff; }
+  .moon {
+    position: absolute; right: 90px; top: 42px; z-index: 3;
+    width: 58px; height: 58px; border-radius: 50%;
+    background: radial-gradient(circle at 62% 38%, #f5ead6, #d8c49a 70%);
+    box-shadow: 0 0 34px rgba(245,234,214,0.5);
+  }
+  .moon::after {
+    content: ''; position: absolute; left: -14px; top: -6px;
+    width: 58px; height: 58px; border-radius: 50%; background: #1c0d33;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="glow"></div>
+  <div class="moon"></div>
+  <div class="cards">
+    <div class="fcard c1"><div class="inner"><div class="sym">&#10022;</div></div></div>
+    <div class="fcard c2"><div class="inner"><div class="sym">&#10038;</div></div></div>
+    <div class="fcard c3"><div class="inner"><div class="sym">&#9790;</div></div></div>
+  </div>
+  <div class="text">
+    <h1>Mystic Oracle</h1>
+    <div class="tagline">TAROT &middot; HOROSCOPES &middot; NATAL CHARTS</div>
+  </div>
+</div>
+<script>
+  for (let i = 0; i < 70; i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = 1 + Math.random() * 2.4;
+    s.style.width = s.style.height = sz + 'px';
+    s.style.left = Math.random() * 1024 + 'px';
+    s.style.top = Math.random() * 500 + 'px';
+    s.style.opacity = 0.25 + Math.random() * 0.65;
+    document.querySelector('.stage').appendChild(s);
+  }
+</script>
+</body>
+</html>
