@@ -444,6 +444,7 @@ const AstroEngine = (function () {
 
     root.querySelector('#natal-result').innerHTML = html;
     root.querySelector('#natal-result').scrollIntoView({ behavior: 'smooth' });
+    if (MysticApp.gamify) MysticApp.gamify.recordReading();
 
     // A written portrait of the chart. This module is Plus-only, so every
     // viewer is already entitled. Silently absent if AI is off or unreachable.

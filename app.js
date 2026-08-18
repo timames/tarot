@@ -169,6 +169,13 @@ const MysticApp = (function () {
       '</svg>',
     star: svgOpen +
       '<path d="M24,6 L29.5,18.5 L43,20 L33,29.5 L35.8,43 L24,36 L12.2,43 L15,29.5 L5,20 L18.5,18.5 Z"/>' +
+      '</svg>',
+    sanctum: svgOpen +
+      '<path d="M9,22 h30 v18 h-30 Z"/>' +
+      '<path d="M9,22 a15,11 0 0 1 30,0"/>' +
+      '<path d="M9,29 h30"/>' +
+      '<path d="M21.5,26 h5 v6 h-5 Z"/>' +
+      '<path d="M24,29.5 v1.5"/>' +
       '</svg>'
   };
 
@@ -185,7 +192,7 @@ const MysticApp = (function () {
   // 'mystic-premium' = '1' whenever the RevenueCat "plus" entitlement is active.
   // Everything here reads it synchronously via isPremium().
 
-  const FREE_MODULES = ['horoscope', 'tarot'];
+  const FREE_MODULES = ['horoscope', 'tarot', 'sanctum'];
   const PLUS_MODULES = ['natal'];
 
   function tierOf(mod) {

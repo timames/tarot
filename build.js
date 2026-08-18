@@ -8,7 +8,7 @@ const FILES = [
   'cards.js', 'art.js', 'tarot.js',
   'horoscope.js', 'natal.js', 'nature.js', 'numerology.js', 'iching.js',
   'runes.js', 'moon.js', 'lucky.js', 'chinese.js',
-  'cities.js', 'ouija.js', 'ads.js'
+  'cities.js', 'ouija.js', 'ads.js', 'gamify.js', 'game-memory.js'
 ];
 
 fs.mkdirSync('www', { recursive: true });

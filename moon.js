@@ -92,6 +92,7 @@
         <p>The waxing moon (new to full) supports building, attracting, and growth. The waning moon (full to new) supports releasing, clearing, and rest. Align your efforts with the tide.</p>
       </div>
     `;
+    if (MysticApp.gamify) MysticApp.gamify.recordReading();
   }
 
   MysticApp.register({

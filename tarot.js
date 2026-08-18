@@ -206,6 +206,13 @@
     });
   }
 
+  // Cosmetic card back — the gamify module supplies the equipped design;
+  // without it, fall back to the original classic markup.
+  function backHtml() {
+    if (MysticApp.gamify && MysticApp.gamify.cardBackHtml) return MysticApp.gamify.cardBackHtml();
+    return '<div class="card-face card-back"><div class="card-back-pattern"><div class="card-back-symbol">&#10022;</div></div></div>';
+  }
+
   // --- Spread picker ---
 
   function render(container) {
@@ -335,9 +342,7 @@
       slot.className = 'card-slot';
       slot.innerHTML = `
         <div class="card ${card.isReversed ? 'reversed' : ''}" data-index="${i}">
-          <div class="card-face card-back">
-            <div class="card-back-pattern"><div class="card-back-symbol">&#10022;</div></div>
-          </div>
+          ${backHtml()}
           <div class="card-face card-front">
             <div class="card-numeral">${card.numeral}</div>
             <div class="card-illustration">${CARD_ART[card.name] || card.icon}</div>
@@ -529,9 +534,7 @@
 
         slot.innerHTML = `
           <div class="card md-card${isTurned ? ' flipped' : ''}${cardInfo.reversed ? ' reversed' : ''}">
-            <div class="card-face card-back">
-              <div class="card-back-pattern"><div class="card-back-symbol">&#10022;</div></div>
-            </div>
+            ${backHtml()}
             <div class="card-face card-front">
               <div class="card-numeral">${cardData ? cardData.numeral : ''}</div>
               <div class="card-illustration">${(typeof CARD_ART !== 'undefined' && CARD_ART[cardInfo.name]) || (cardData ? cardData.icon : '')}</div>
@@ -545,6 +548,7 @@
           if (isTurnable) {
             data.turnedDays.push(today);
             saveSpread(cfg.key, data);
+            if (MysticApp.gamify) MysticApp.gamify.recordReading();
             if (MysticApp.notify) MysticApp.notify.refreshStreak();
             renderMultiDay(size, data);
             setTimeout(() => showMDDetail(size, data, idx), 100);

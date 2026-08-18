@@ -668,6 +668,7 @@ const ZODIAC_SIGNS = [
 
     if (currentMode === 'day') {
       body.innerHTML = dailyHtml(currentSign, aiFor('day', currentSign));
+      if (MysticApp.gamify) MysticApp.gamify.recordReading();
       maybeUpgrade();
       return;
     }
