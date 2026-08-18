@@ -6,6 +6,12 @@ const path = require('path');
 const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const SITE = 'https://tarot.ripdi.net';
 
+// Default: Android/Play (360x640 @3 = 1080x1920, 9:16).
+// IOS=1: iPhone 6.9" (430x932 @3 = 1290x2796) with "ios-" filename prefix.
+const IOS = process.env.IOS === '1';
+const VIEW = IOS ? { width: 430, height: 932 } : { width: 360, height: 640 };
+const PREFIX = IOS ? 'ios-' : '';
+
 const dayNum = Math.floor(new Date(new Date().toDateString()).getTime() / 86400000);
 const d = new Date();
 const todayKey = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -46,8 +52,8 @@ async function goHome(page) {
 async function shot(page, file) {
   await page.evaluate(() => window.scrollTo(0, 0));
   await sleep(400);
-  await page.screenshot({ path: path.join(__dirname, file) });
-  console.log('saved', file);
+  await page.screenshot({ path: path.join(__dirname, PREFIX + file) });
+  console.log('saved', PREFIX + file);
 }
 
 (async () => {
@@ -57,7 +63,7 @@ async function shot(page, file) {
     args: ['--hide-scrollbars', '--force-device-scale-factor=3']
   });
   const page = await browser.newPage();
-  await page.setViewport({ width: 360, height: 640, deviceScaleFactor: 3 });
+  await page.setViewport({ width: VIEW.width, height: VIEW.height, deviceScaleFactor: 3 });
   await page.evaluateOnNewDocument((profile, gamify, tk) => {
     localStorage.setItem('mystic-profile', JSON.stringify(profile));
     localStorage.setItem('mystic-gamify', JSON.stringify(gamify));
