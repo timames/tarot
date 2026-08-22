@@ -202,6 +202,9 @@ const MysticApp = (function () {
   }
 
   function isPremium() {
+    // The web version is fully unlocked; monetization applies only in the
+    // native Android/iOS apps.
+    if (!(window.Capacitor && window.Capacitor.isNativePlatform())) return true;
     try { return localStorage.getItem('mystic-premium') === '1'; } catch (e) { return false; }
   }
 
