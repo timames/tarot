@@ -201,7 +201,13 @@ const MysticApp = (function () {
     return 'rewarded';
   }
 
+  // TEMP — closed testing: everything unlocked on native builds (no ads, no
+  // paywalls) until the Play listing is live and AdMob review completes.
+  // Set back to false before the production release.
+  const TESTING_UNLOCK = true;
+
   function isPremium() {
+    if (TESTING_UNLOCK) return true;
     // The web version is fully unlocked; monetization applies only in the
     // native Android/iOS apps.
     if (!(window.Capacitor && window.Capacitor.isNativePlatform())) return true;
